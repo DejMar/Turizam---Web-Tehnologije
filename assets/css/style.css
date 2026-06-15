@@ -80,6 +80,24 @@ body {
     color: var(--primary);
 }
 
+.nav a.btn-primary {
+    color: var(--white);
+}
+
+.nav a.btn-primary:hover {
+    color: var(--white);
+    background: var(--primary-dark);
+}
+
+.nav a.btn-outline {
+    color: var(--primary);
+}
+
+.nav a.btn-outline:hover {
+    color: var(--primary);
+    background: var(--primary-light);
+}
+
 .user-greeting {
     color: var(--text-muted);
     font-size: 0.9rem;
@@ -196,14 +214,39 @@ body {
 }
 
 .filter-form {
-    display: flex;
+    display: grid;
+    grid-template-columns: 2fr 1fr auto;
     gap: 1rem;
-    flex-wrap: wrap;
-    align-items: flex-end;
+    align-items: end;
     background: var(--white);
     padding: 1.25rem;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
+}
+
+.filter-form .form-group {
+    margin-bottom: 0;
+}
+
+.filter-form .form-group input,
+.filter-form .form-group select {
+    height: 42px;
+}
+
+.filter-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    height: 42px;
+}
+
+.filter-actions .btn {
+    white-space: nowrap;
+    height: 42px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Forms */
@@ -264,6 +307,9 @@ body {
 }
 
 .room-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     background: var(--white);
     border-radius: var(--radius);
     overflow: hidden;
@@ -311,18 +357,28 @@ body {
 }
 
 .room-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
     padding: 1.25rem;
 }
 
 .room-body h2 {
     font-size: 1.2rem;
     margin-bottom: 0.5rem;
+    min-height: 2.4rem;
 }
 
 .room-desc {
     color: var(--text-muted);
     font-size: 0.9rem;
     margin-bottom: 1rem;
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 4.05rem;
 }
 
 .room-meta {
@@ -342,6 +398,8 @@ body {
 .room-actions {
     display: flex;
     gap: 0.75rem;
+    margin-top: auto;
+    padding-top: 1rem;
 }
 
 .room-actions .btn {
@@ -742,5 +800,14 @@ body {
         flex-direction: column;
         align-items: flex-start;
         gap: 1rem;
+    }
+
+    .filter-form {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-actions {
+        height: auto;
+        flex-wrap: wrap;
     }
 }

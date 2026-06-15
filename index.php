@@ -51,10 +51,12 @@ require_once __DIR__ . '/includes/header.php';
                 <option value="suite" <?= $tip === 'suite' ? 'selected' : '' ?>>Suite</option>
             </select>
         </div>
-        <button type="submit" class="btn btn-primary">Filtriraj</button>
-        <?php if ($tip || $pretraga): ?>
-            <a href="index.php" class="btn btn-outline">Poništi</a>
-        <?php endif; ?>
+        <div class="filter-actions">
+            <button type="submit" class="btn btn-primary">Filtriraj</button>
+            <?php if ($tip || $pretraga): ?>
+                <a href="index.php" class="btn btn-outline">Poništi</a>
+            <?php endif; ?>
+        </div>
     </form>
 </section>
 
