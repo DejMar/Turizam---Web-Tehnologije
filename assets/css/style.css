@@ -126,6 +126,10 @@ body {
     font-size: 1.1rem;
 }
 
+.hero-docs-btn {
+    margin-top: 1rem;
+}
+
 /* Buttons */
 .btn {
     display: inline-block;

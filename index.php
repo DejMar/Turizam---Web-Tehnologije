@@ -33,6 +33,7 @@ require_once __DIR__ . '/includes/header.php';
 <section class="hero">
     <h1>Dobrodošli u naš hotel</h1>
     <p>Pregledajte dostupne sobe i rezervišite svoj boravak online.</p>
+    <a href="dokumentacija.html" class="btn btn-outline hero-docs-btn">Dokumentacija projekta</a>
 </section>
 
 <section class="filters">

@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dokumentacija projekta - Turizam Rezervacija Soba</title>
+    <style>
+        :root {
+            --primary: #1a5f7a;
+            --primary-dark: #134a61;
+            --primary-light: #e8f4f8;
+            --text: #2c3e50;
+            --text-muted: #5d6d7e;
+            --border: #dfe6e9;
+            --bg: #f8fafb;
+            --white: #ffffff;
+            --code-bg: #1e2a32;
+            --code-text: #e8edf2;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            line-height: 1.7;
+        }
+
+        .docs-header {
+            background: var(--primary);
+            color: var(--white);
+            padding: 2.5rem 1.5rem;
+        }
+
+        .docs-header .inner {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        .docs-header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .docs-header p { opacity: 0.9; }
+
+        .docs-nav {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .docs-nav .inner {
+            max-width: 960px;
+            margin: 0 auto;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .docs-nav a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .docs-nav a:hover { text-decoration: underline; }
+
+        .docs-content {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        section {
+            background: var(--white);
+            border-radius: 10px;
+            padding: 1.75rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        h2 {
+            color: var(--primary);
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            margin: 1.25rem 0 0.75rem;
+            color: var(--primary-dark);
+        }
+
+        p { margin-bottom: 0.75rem; }
+
+        ul, ol { margin: 0.5rem 0 1rem 1.5rem; }
+        li { margin-bottom: 0.35rem; }
+
+        .tree {
+            background: var(--primary-light);
+            padding: 1.25rem;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.8;
+            overflow-x: auto;
+        }
+
+        .structure-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .structure-overview-item {
+            background: linear-gradient(135deg, var(--primary-light), #fff);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--primary);
+            border-radius: 8px;
+            padding: 1rem 1.1rem;
+        }
+
+        .structure-overview-item strong {
+            display: block;
+            color: var(--primary);
+            margin-bottom: 0.35rem;
+        }
+
+        .structure-overview-item span {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .structure-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+            margin-top: 1.5rem;
+        }
+
+        .structure-group {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            background: #fafcfd;
+        }
+
+        .structure-group-header {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: var(--primary);
+            color: var(--white);
+            padding: 0.85rem 1rem;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .structure-group-header .icon {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        .structure-group-body {
+            padding: 0.5rem 0;
+        }
+
+        .structure-item {
+            display: grid;
+            grid-template-columns: minmax(120px, 38%) 1fr;
+            gap: 0.75rem;
+            padding: 0.7rem 1rem;
+            border-bottom: 1px solid var(--border);
+            align-items: start;
+        }
+
+        .structure-item:last-child {
+            border-bottom: none;
+        }
+
+        .structure-item:hover {
+            background: var(--primary-light);
+        }
+
+        .structure-item .file-name {
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            word-break: break-all;
+        }
+
+        .structure-item .file-desc {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .structure-root {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 0.85rem 1.1rem;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 600px) {
+            .structure-item {
+                grid-template-columns: 1fr;
+                gap: 0.25rem;
+            }
+        }
+
+        .file-card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .file-card h4 {
+            font-family: monospace;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            margin: 0.75rem 0;
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background: var(--primary-light);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.65rem 0.85rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--primary-light);
+            font-weight: 600;
+        }
+
+        .badge {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .flow {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+            margin: 1rem 0;
+        }
+
+        .flow span {
+            background: var(--primary-light);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .flow .arrow { background: none; color: var(--text-muted); }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.6rem 1.25rem;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .back-btn:hover { background: var(--primary-dark); }
+    </style>
+</head>
+<body>
+
+<header class="docs-header">
+    <div class="inner">
+        <h1>Dokumentacija projekta</h1>
+        <p>Turizam — Sistem za rezervaciju soba (HTML, CSS, JavaScript, PHP, MySQL)</p>
+    </div>
+</header>
+
+<nav class="docs-nav">
+    <div class="inner">
+        <a href="#pregled">Pregled</a>
+        <a href="#struktura">Struktura</a>
+        <a href="#baza">Baza podataka</a>
+        <a href="#backend">PHP backend</a>
+        <a href="#frontend">Frontend</a>
+        <a href="#admin">Administracija</a>
+        <a href="#tok">Tok podataka</a>
+        <a href="#pokretanje">Pokretanje</a>
+        <a href="index.php">← Nazad na aplikaciju</a>
+    </div>
+</nav>
+
+<main class="docs-content">
+
+    <section id="pregled">
+        <h2>1. Pregled aplikacije</h2>
+        <p>
+            Aplikacija je web sistem za upravljanje hotelskim sobama i online rezervacijama.
+            Korisnici mogu pregledati sobe, kreirati rezervacije i pratiti njihov status.
+            Administratori imaju pristup panelu za upravljanje rezervacijama, sobama, korisnicima i izvještajima o zauzetosti.
+        </p>
+        <h3>Tehnologije</h3>
+        <ul>
+            <li><strong>HTML</strong> — struktura stranica</li>
+            <li><strong>CSS</strong> — stilizacija i responzivni dizajn</li>
+            <li><strong>JavaScript</strong> — validacija formi i dinamički izračun cijene</li>
+            <li><strong>PHP</strong> — serverska logika, autentifikacija, rad sa bazom</li>
+            <li><strong>MySQL</strong> — pohrana podataka (korisnici, sobe, rezervacije)</li>
+        </ul>
+        <h3>Glavne funkcionalnosti</h3>
+        <ul>
+            <li>Pregled i filtriranje soba</li>
+            <li>Online rezervacija sa provjerom dostupnosti</li>
+            <li>Registracija i prijava korisnika</li>
+            <li>Administracija rezervacija, soba i korisnika</li>
+            <li>Izvještaji o zauzetosti po sobama i mjesecima</li>
+        </ul>
+    </section>
+
+    <section id="struktura">
+        <h2>2. Struktura projekta</h2>
+        <p>Projekat je organizovan u logičke cjeline — javne stranice, admin panel, zajednički kod i resursi.</p>
+
+        <div class="structure-root">📁 Turizam - Web Tehnologije/</div>
+
+        <div class="structure-overview">
+            <div class="structure-overview-item">
+                <strong>Javne stranice</strong>
+                <span>Pregled soba, rezervacije, prijava korisnika</span>
+            </div>
+            <div class="structure-overview-item">
+                <strong>Zajednički kod</strong>
+                <span>config/, includes/ — baza, auth, header/footer</span>
+            </div>
+            <div class="structure-overview-item">
+                <strong>Administracija</strong>
+                <span>admin/ — upravljanje sistemom</span>
+            </div>
+            <div class="structure-overview-item">
+                <strong>Resursi i baza</strong>
+                <span>assets/, sql/ — stilovi, JS, šema baze</span>
+            </div>
+        </div>
+
+        <div class="structure-grid">
+            <div class="structure-group">
+                <div class="structure-group-header">
+                    <span class="icon">🌐</span> Javne stranice (root)
+                </div>
+                <div class="structure-group-body">
+                    <div class="structure-item">
+                        <span class="file-name">index.php</span>
+                        <span class="file-desc">Početna stranica — pregled i filtriranje soba</span>
+                    </div>
+                    <div class="structure-item">
+                        <span class="file-name">soba.php</span>
+                        <span class="file-desc">Detalji pojedinačne sobe</span>
+                    </div>
+                    <div class="structure-item">
+                        <span class="file-name">rezervacija.php</span>
+                        <span class="file-desc">Forma za online rezervaciju</span>
+                    </div>
+                    <div class="structure-item">
+                        <span class="file-name">login.php</span>
+                        <span class="file-desc">Prijava korisnika u sistem</span>
+                    </div>
+                    <div class="structure-item">
+                        <span class="file-name">register.php</span>
+                        <span class="file-desc">Registracija novog korisnika</span>
+                    </div>
+                    <div class="structure-item">
+                        <span class="file-name">logout.php</span>
+                        <span class="file-desc">Odjava — briše PHP sesiju</span>
+                    </div>
+                    <div class="structure-item">
+                        <span class="file-name">moje-rezervacije.php</span>
+                        <span class="file-desc">Pregled rezervacija prijavljenog korisnika</span>
+                    </div>
+                    <div class="structure-item">
+                        <span class="file-name">setup.php</span>
+                        <span class="file-desc">Instalacija baze podataka</span>
+                    </div>
+                    <div class="structure-item">
+                        <span class="file-name">dokumentacija.html</span>
+                        <span class="file-desc">Dokumentacija projekta (ovaj fajl)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="structure-group">
+                <div class="structure-group-header">
+                    <span class="icon">⚙️</span> config/
+                </div>
+                <div class="structure-group-body">
+                    <div class="structure-item">
+                        <span class="file-name">database.php</span>
+                        <span class="file-desc">Konekcija na MySQL, konstante i pomoćne funkcije (formatDate, flash...)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="structure-group">
+                <div class="structure-group-header">
+                    <span class="icon">📦</span> includes/
+                </div>
+                <div class="structure-group-body">
+                    <div class="structure-item">
+                        <span class="file-name">auth.php</span>
+                        <span class="file-desc">Autentifikacija, autorizacija, login, registracija</span>
+                    </div>
+                    <div class="structure-item">
+                        <span class="file-name">header.php</span>
+                        <span class="file-desc">Zajednički HTML header i navigacija</span>
+                    </div>
+                    <div class="structure-item">
+                        <span class="file-name">footer.php</span>
+                        <span class="file-desc">Zajednički HTML footer i učitavanje JS-a</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="structure-group">
+                <div class="structure-group-header">
+                    <span class="icon">🛡️</span> admin/
+                </div>
+                <div class="structure-group-body">
+                    <div class="structure-item">
+                        <span class="file-name">index.php</span>
+                        <span class="file-desc">Kontrolna tabla sa statistikama</span>
+                    </div>
+                    <div class="structure-item">
+                        <span class="file-name">rezervacije.php</span>
+                        <span class="file-desc">Upravljanje rezervacijama (potvrda, otkazivanje)</span>
+                    </div>
+                    <div class="structure-item">
+                        <span class="file-name">sobe.php</span>
+                        <span class="file-desc">Dodavanje i upravljanje sobama</span>
+                    </div>
+                    <div class="structure-item">
+                        <span class="file-name">korisnici.php</span>
+                        <span class="file-desc">Upravljanje korisnicima i ulogama</span>
+                    </div>
+                    <div class="structure-item">
+                        <span class="file-name">izvjestaji.php</span>
+                        <span class="file-desc">Izvještaji o zauzetosti po sobama</span>
+                    </div>
+                    <div class="structure-item">
+                        <span class="file-name">includes/sidebar.php</span>
+                        <span class="file-desc">Bočni meni administracije</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="structure-group">
+                <div class="structure-group-header">
+                    <span class="icon">🎨</span> assets/
+                </div>
+                <div class="structure-group-body">
+                    <div class="structure-item">
+                        <span class="file-name">css/style.css</span>
+                        <span class="file-desc">Glavni stilovi aplikacije</span>
+                    </div>
+                    <div class="structure-item">
+                        <span class="file-name">js/main.js</span>
+                        <span class="file-desc">Validacija formi i izračun cijene rezervacije</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="structure-group">
+                <div class="structure-group-header">
+                    <span class="icon">🗄️</span> sql/
+                </div>
+                <div class="structure-group-body">
+                    <div class="structure-item">
+                        <span class="file-name">schema.sql</span>
+                        <span class="file-desc">SQL šema — tabele korisnici, sobe, rezervacije</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="baza">
+        <h2>3. Baza podataka (MySQL)</h2>
+        <p>Baza se zove <code>turizam_sobe</code> i sadrži tri glavne tabele povezane relacijama.</p>
+
+        <h3>Tabela: korisnici</h3>
+        <table>
+            <tr><th>Kolona</th><th>Tip</th><th>Opis</th></tr>
+            <tr><td>id</td><td>INT</td><td>Primarni ključ</td></tr>
+            <tr><td>ime, prezime</td><td>VARCHAR</td><td>Podaci o korisniku</td></tr>
+            <tr><td>email</td><td>VARCHAR</td><td>Jedinstvena email adresa</td></tr>
+            <tr><td>lozinka</td><td>VARCHAR</td><td>Haširana lozinka (bcrypt)</td></tr>
+            <tr><td>uloga</td><td>ENUM</td><td><code>admin</code> ili <code>gost</code></td></tr>
+            <tr><td>aktivan</td><td>TINYINT</td><td>Da li je nalog aktivan</td></tr>
+        </table>
+
+        <h3>Tabela: sobe</h3>
+        <table>
+            <tr><th>Kolona</th><th>Tip</th><th>Opis</th></tr>
+            <tr><td>id</td><td>INT</td><td>Primarni ključ</td></tr>
+            <tr><td>naziv, opis</td><td>VARCHAR/TEXT</td><td>Naziv i opis sobe</td></tr>
+            <tr><td>tip</td><td>ENUM</td><td>jednokrevetna, dvokrevetna, apartman, suite</td></tr>
+            <tr><td>kapacitet</td><td>INT</td><td>Maksimalan broj gostiju</td></tr>
+            <tr><td>cijena_po_noci</td><td>DECIMAL</td><td>Cijena boravka po noći</td></tr>
+            <tr><td>dostupna</td><td>TINYINT</td><td>Da li je soba dostupna za rezervaciju</td></tr>
+        </table>
+
+        <h3>Tabela: rezervacije</h3>
+        <table>
+            <tr><th>Kolona</th><th>Tip</th><th>Opis</th></tr>
+            <tr><td>id</td><td>INT</td><td>Primarni ključ</td></tr>
+            <tr><td>korisnik_id</td><td>INT</td><td>FK → korisnici</td></tr>
+            <tr><td>soba_id</td><td>INT</td><td>FK → sobe</td></tr>
+            <tr><td>datum_od, datum_do</td><td>DATE</td><td>Period boravka</td></tr>
+            <tr><td>broj_gostiju</td><td>INT</td><td>Broj gostiju</td></tr>
+            <tr><td>ukupna_cijena</td><td>DECIMAL</td><td>Izračunata cijena boravka</td></tr>
+            <tr><td>status</td><td>ENUM</td><td>na_cekanju, potvrdena, otkazana, zavrsena</td></tr>
+            <tr><td>napomena</td><td>TEXT</td><td>Dodatne napomene gosta</td></tr>
+        </table>
+
+        <h3>Relacije</h3>
+        <ul>
+            <li>Jedan korisnik može imati više rezervacija</li>
+            <li>Jedna soba može imati više rezervacija (u različitim periodima)</li>
+            <li>Brisanje korisnika ili sobe kaskadno briše povezane rezervacije (ON DELETE CASCADE)</li>
+        </ul>
+    </section>
+
+    <section id="backend">
+        <h2>4. PHP backend — objašnjenje koda</h2>
+
+        <div class="file-card">
+            <h4>config/database.php</h4>
+            <p>Centralna konfiguracija aplikacije. Sadrži:</p>
+            <ul>
+                <li><code>getDB()</code> — kreira PDO konekciju na MySQL (singleton pattern — jedna konekcija po zahtjevu)</li>
+                <li><code>e()</code> — escape HTML karaktera radi zaštite od XSS napada</li>
+                <li><code>formatDate()</code>, <code>formatPrice()</code> — formatiranje datuma i cijena za prikaz</li>
+                <li><code>flash()</code> / <code>getFlash()</code> — poruke korisniku nakon preusmjeravanja (npr. "Uspješna prijava")</li>
+                <li><code>redirect()</code> — preusmjeravanje na drugu stranicu</li>
+            </ul>
+            <pre><code>function getDB(): PDO {
+    static $pdo = null;
+    if ($pdo === null) {
+        $pdo = new PDO($dsn, DB_USER, DB_PASS, [...]);
+    }
+    return $pdo;
+}</code></pre>
+        </div>
+
+        <div class="file-card">
+            <h4>includes/auth.php</h4>
+            <p>Upravlja autentifikacijom i autorizacijom korisnika:</p>
+            <ul>
+                <li><code>session_start()</code> — pokreće PHP sesiju za čuvanje prijave</li>
+                <li><code>isLoggedIn()</code> — provjerava da li postoji <code>$_SESSION['korisnik_id']</code></li>
+                <li><code>currentUser()</code> — učitava podatke trenutnog korisnika iz baze</li>
+                <li><code>isAdmin()</code> — provjerava da li korisnik ima ulogu admin</li>
+                <li><code>requireLogin()</code> — zaštita stranica koje zahtijevaju prijavu</li>
+                <li><code>requireAdmin()</code> — zaštita admin stranica</li>
+                <li><code>login()</code> — provjerava email/lozinku pomoću <code>password_verify()</code></li>
+                <li><code>registerUser()</code> — validacija i registracija sa <code>password_hash()</code></li>
+                <li><code>sobaJeDostupna()</code> — SQL upit koji provjerava preklapanje rezervacija u datom periodu</li>
+                <li><code>izracunajCijenu()</code> — broj noćenja × cijena po noći</li>
+            </ul>
+        </div>
+
+        <div class="file-card">
+            <h4>index.php — Pregled soba</h4>
+            <p>Glavna stranica aplikacije. Tok izvršavanja:</p>
+            <ol>
+                <li>Učitava <code>auth.php</code> za sesiju i korisnika</li>
+                <li>Čita GET parametre <code>tip</code> i <code>pretraga</code> za filtriranje</li>
+                <li>Gradi dinamički SQL upit sa prepared statements (zaštita od SQL injection)</li>
+                <li>Prikazuje sobe u grid karticama</li>
+            </ol>
+            <pre><code>$sql = 'SELECT * FROM sobe WHERE dostupna = 1';
+if ($tip) { $sql .= ' AND tip = ?'; }
+$stmt = getDB()->prepare($sql);
+$stmt->execute($params);</code></pre>
+        </div>
+
+        <div class="file-card">
+            <h4>rezervacija.php — Online rezervacija</h4>
+            <p>Zaštićena stranica (<code>requireLogin()</code>). Pri POST zahtjevu:</p>
+            <ol>
+                <li>Validira datume (dolazak &lt; odlazak, ne u prošlosti)</li>
+                <li>Provjerava kapacitet sobe</li>
+                <li>Poziva <code>sobaJeDostupna()</code> da spriječi duple rezervacije</li>
+                <li>Računa cijenu i upisuje rezervaciju sa statusom <code>na_cekanju</code></li>
+            </ol>
+        </div>
+
+        <div class="file-card">
+            <h4>includes/header.php i footer.php</h4>
+            <p>
+                Zajednički HTML dio koji se uključuje na svakoj stranici pomoću <code>require_once</code>.
+                Header prikazuje navigaciju, ime korisnika i flash poruke.
+                Footer učitava <code>main.js</code>.
+                Ovim se izbjegava ponavljanje istog koda na svakoj stranici (DRY princip).
+            </p>
+        </div>
+
+        <div class="file-card">
+            <h4>setup.php</h4>
+            <p>
+                Jednokratna instalaciona skripta. Čita <code>sql/schema.sql</code>, kreira bazu i tabele,
+                zatim dodaje test korisnike (admin i gost) sa sigurno haširanim lozinkama.
+            </p>
+        </div>
+    </section>
+
+    <section id="frontend">
+        <h2>5. Frontend — HTML, CSS i JavaScript</h2>
+
+        <div class="file-card">
+            <h4>assets/css/style.css</h4>
+            <p>Glavni CSS fajl sa CSS varijablama za boje (<code>:root</code>). Sadrži stilove za:</p>
+            <ul>
+                <li>Header i navigaciju</li>
+                <li>Kartice soba (grid layout, flex za poravnanje dugmadi)</li>
+                <li>Forme i dugmad</li>
+                <li>Tabele za admin panel</li>
+                <li>Responzivni dizajn (<code>@media</code> za mobilne uređaje)</li>
+            </ul>
+        </div>
+
+        <div class="file-card">
+            <h4>assets/js/main.js</h4>
+            <p>JavaScript se izvršava nakon učitavanja stranice (<code>DOMContentLoaded</code>):</p>
+            <ul>
+                <li><strong>initReservationForm()</strong> — dinamički izračun cijene rezervacije dok korisnik bira datume</li>
+                <li><strong>initRegisterForm()</strong> — provjera da se lozinke poklapaju prije slanja</li>
+                <li><strong>initDateValidation()</strong> — postavlja minimalni datum na današnji dan</li>
+            </ul>
+            <pre><code>const nocenja = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+const ukupno = nocenja * cijenaPoNoci;</code></pre>
+        </div>
+    </section>
+
+    <section id="admin">
+        <h2>6. Administrativni panel</h2>
+        <p>
+            Admin stranice se nalaze u folderu <code>admin/</code> i zaštićene su sa <code>requireAdmin()</code>.
+            Koriste zajednički bočni meni iz <code>admin/includes/sidebar.php</code>.
+        </p>
+
+        <table>
+            <tr><th>Stranica</th><th>Funkcija</th></tr>
+            <tr><td>admin/index.php</td><td>Kontrolna tabla — statistike i nedavne rezervacije</td></tr>
+            <tr><td>admin/rezervacije.php</td><td>Pregled svih rezervacija, promjena statusa (potvrdi/otkaži/završi)</td></tr>
+            <tr><td>admin/sobe.php</td><td>Dodavanje novih soba, uključivanje/isključivanje dostupnosti</td></tr>
+            <tr><td>admin/korisnici.php</td><td>Dodavanje korisnika, promjena uloge, aktivacija/deaktivacija</td></tr>
+            <tr><td>admin/izvjestaji.php</td><td>Mjesečni izvještaj zauzetosti po sobama, prihod, statusi</td></tr>
+        </table>
+
+        <h3>Statusi rezervacija</h3>
+        <div class="flow">
+            <span>na_cekanju</span>
+            <span class="arrow">→</span>
+            <span>potvrdena</span>
+            <span class="arrow">→</span>
+            <span>zavrsena</span>
+        </div>
+        <p>Rezervacija može biti <span class="badge">otkazana</span> iz bilo kojeg aktivnog statusa.</p>
+    </section>
+
+    <section id="tok">
+        <h2>7. Tok podataka — primjer rezervacije</h2>
+        <div class="flow">
+            <span>Korisnik otvori index.php</span>
+            <span class="arrow">→</span>
+            <span>Klikne "Rezerviši"</span>
+            <span class="arrow">→</span>
+            <span>login.php (ako nije prijavljen)</span>
+            <span class="arrow">→</span>
+            <span>rezervacija.php</span>
+            <span class="arrow">→</span>
+            <span>PHP validacija</span>
+            <span class="arrow">→</span>
+            <span>INSERT u bazu</span>
+            <span class="arrow">→</span>
+            <span>moje-rezervacije.php</span>
+        </div>
+
+        <h3>Sigurnosne mjere u kodu</h3>
+        <ul>
+            <li><strong>Prepared statements</strong> — svi SQL upiti koriste <code>prepare()</code> i <code>execute()</code> sa parametrima</li>
+            <li><strong>password_hash / password_verify</strong> — sigurno čuvanje lozinki</li>
+            <li><strong>htmlspecialchars (e())</strong> — zaštita od XSS pri prikazu korisničkih podataka</li>
+            <li><strong>Sesije</strong> — autentifikacija bez slanja lozinke pri svakom zahtjevu</li>
+            <li><strong>requireLogin / requireAdmin</strong> — kontrola pristupa stranicama</li>
+        </ul>
+    </section>
+
+    <section id="pokretanje">
+        <h2>8. Pokretanje aplikacije</h2>
+        <ol>
+            <li>Pokreni MySQL: <code>brew services start mysql</code></li>
+            <li>Instaliraj bazu (samo prvi put): <code>php setup.php</code></li>
+            <li>Pokreni PHP server:
+                <pre><code>cd "/putanja/do/projekta"
+php -S localhost:8000</code></pre>
+            </li>
+            <li>Otvori browser: <a href="http://localhost:8000">http://localhost:8000</a></li>
+        </ol>
+
+        <h3>Test nalozi</h3>
+        <table>
+            <tr><th>Uloga</th><th>Email</th><th>Lozinka</th></tr>
+            <tr><td>Admin</td><td>admin@turizam.rs</td><td>admin123</td></tr>
+            <tr><td>Gost</td><td>gost@turizam.rs</td><td>gost123</td></tr>
+        </table>
+
+        <a href="index.php" class="back-btn">← Nazad na aplikaciju</a>
+    </section>
+
+</main>
+
+</body>
+</html>
