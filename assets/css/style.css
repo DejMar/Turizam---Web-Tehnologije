@@ -807,6 +807,27 @@ body {
     border-radius: var(--radius);
 }
 
+.admin-filters {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.admin-search-input {
+    padding: 0.5rem 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+    min-width: 180px;
+}
+
+.admin-filters select {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
 .actions-cell {
     white-space: nowrap;
 }

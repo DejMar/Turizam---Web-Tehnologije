@@ -312,6 +312,26 @@
         }
 
         .back-btn:hover { background: var(--primary-dark); }
+
+        .info-box {
+            background: var(--primary-light);
+            border-left: 4px solid var(--primary);
+            padding: 1rem 1.25rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+        }
+
+        .report-preview {
+            background: #fafcfd;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+            font-family: monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            margin: 1rem 0;
+            white-space: pre;
+        }
     </style>
 </head>
 <body>
@@ -328,9 +348,11 @@
         <a href="#pregled">Pregled</a>
         <a href="#struktura">Struktura</a>
         <a href="#baza">Baza podataka</a>
+        <a href="#baza-povezivanje">Povezivanje baze</a>
         <a href="#backend">PHP backend</a>
         <a href="#frontend">Frontend</a>
         <a href="#admin">Administracija</a>
+        <a href="#izvjestaji">Izvještaji</a>
         <a href="#tok">Tok podataka</a>
         <a href="#pokretanje">Pokretanje</a>
         <a href="index.php">← Nazad na aplikaciju</a>
@@ -573,6 +595,82 @@
             <li>Jedna soba može imati više rezervacija (u različitim periodima)</li>
             <li>Brisanje korisnika ili sobe kaskadno briše povezane rezervacije (ON DELETE CASCADE)</li>
         </ul>
+
+        <h3 id="baza-kreiranje">Kako se baza kreira</h3>
+        <p>Baza se ne kreira ručno u DBeaveru — koristi se automatizovana instalacija:</p>
+        <ol>
+            <li><strong><code>sql/schema.sql</code></strong> — sadrži SQL naredbe za kreiranje baze <code>turizam_sobe</code>, tri tabele, strane ključeve i početne podatke (12 soba)</li>
+            <li><strong><code>setup.php</code></strong> — instalaciona skripta koja:
+                <ul>
+                    <li>poveže se na MySQL server</li>
+                    <li>pročita i izvrši sve naredbe iz <code>schema.sql</code></li>
+                    <li>kreira test korisnike (admin i gost) sa haširanim lozinkama</li>
+                    <li>doda primjer rezervacija za testiranje</li>
+                </ul>
+            </li>
+        </ol>
+        <p>Pokretanje (samo jednom): <code>php setup.php</code></p>
+
+        <h3 id="baza-povezivanje">Kako je baza povezana sa kodom</h3>
+        <p>Sva komunikacija sa bazom ide kroz jednu centralnu tačku — funkciju <code>getDB()</code> u fajlu <code>config/database.php</code>.</p>
+
+        <div class="file-card">
+            <h4>Lanac uključivanja fajlova</h4>
+            <div class="flow">
+                <span>index.php</span>
+                <span class="arrow">→</span>
+                <span>includes/auth.php</span>
+                <span class="arrow">→</span>
+                <span>config/database.php</span>
+                <span class="arrow">→</span>
+                <span>getDB()</span>
+            </div>
+            <p>Svaka PHP stranica na početku uključuje <code>auth.php</code>, koji učitava <code>database.php</code>. Tako sve stranice imaju pristup bazi bez ponavljanja koda.</p>
+        </div>
+
+        <div class="file-card">
+            <h4>Funkcija getDB() — PDO konekcija</h4>
+            <p>Koristi <strong>PDO</strong> (PHP Data Objects) za sigurnu komunikaciju sa MySQL-om. Konekcija se kreira samo jednom po učitavanju stranice (singleton pattern).</p>
+            <pre><code>function getDB(): PDO {
+    static $pdo = null;
+    if ($pdo === null) {
+        $dsn = 'mysql:host=localhost;dbname=turizam_sobe;charset=utf8mb4';
+        $pdo = new PDO($dsn, DB_USER, DB_PASS, [...]);
+    }
+    return $pdo;
+}</code></pre>
+        </div>
+
+        <h3>Čitanje podataka (SELECT)</h3>
+        <p>Primjer iz <code>index.php</code> — učitavanje soba iz baze:</p>
+        <pre><code>$stmt = getDB()->prepare("SELECT * FROM sobe WHERE dostupna = 1");
+$stmt->execute($params);
+$sobe = $stmt->fetchAll();</code></pre>
+        <ol>
+            <li><code>getDB()</code> — otvara konekciju</li>
+            <li><code>prepare()</code> — priprema SQL upit</li>
+            <li><code>execute($params)</code> — izvršava sa parametrima (zaštita od SQL injection)</li>
+            <li><code>fetchAll()</code> — vraća rezultate kao PHP niz za prikaz u HTML-u</li>
+        </ol>
+
+        <h3>Pisanje podataka (INSERT)</h3>
+        <p>Primjer iz <code>rezervacija.php</code> — snimanje nove rezervacije:</p>
+        <pre><code>$stmt = getDB()->prepare('INSERT INTO rezervacije (...) VALUES (?, ?, ...)');
+$stmt->execute([$korisnik_id, $soba_id, $datum_od, ...]);</code></pre>
+        <p>Korisnik popuni formu → PHP validira podatke → novi red se upisuje u tabelu <code>rezervacije</code>.</p>
+
+        <h3>Koje stranice koriste koju tabelu</h3>
+        <table>
+            <tr><th>Stranica</th><th>Tabele</th><th>Operacija</th></tr>
+            <tr><td>index.php</td><td>sobe</td><td>SELECT</td></tr>
+            <tr><td>rezervacija.php</td><td>sobe, rezervacije</td><td>SELECT, INSERT</td></tr>
+            <tr><td>login.php / register.php</td><td>korisnici</td><td>SELECT, INSERT</td></tr>
+            <tr><td>moje-rezervacije.php</td><td>rezervacije, sobe</td><td>SELECT (JOIN)</td></tr>
+            <tr><td>admin/rezervacije.php</td><td>rezervacije, sobe, korisnici</td><td>SELECT, UPDATE</td></tr>
+            <tr><td>admin/korisnici.php</td><td>korisnici</td><td>SELECT, INSERT, UPDATE</td></tr>
+            <tr><td>admin/sobe.php</td><td>sobe</td><td>SELECT, INSERT, UPDATE</td></tr>
+            <tr><td>admin/izvjestaji.php</td><td>rezervacije, sobe</td><td>SELECT (agregacije)</td></tr>
+        </table>
     </section>
 
     <section id="backend">
@@ -714,8 +812,126 @@ const ukupno = nocenja * cijenaPoNoci;</code></pre>
         <p>Rezervacija može biti <span class="badge">otkazana</span> iz bilo kojeg aktivnog statusa.</p>
     </section>
 
+    <section id="izvjestaji">
+        <h2>7. Izvještaj o zauzetosti — kako radi</h2>
+        <p>
+            Stranica <code>admin/izvjestaji.php</code> prikazuje statistiku hotela za <strong>izabrani mjesec</strong>.
+            Dostupna je samo administratorima (<code>requireAdmin()</code>).
+        </p>
+
+        <h3>Izbor mjeseca</h3>
+        <p>
+            Padajući meni omogućava izbor mjeseca (posljednjih 6 mjeseci + tekući).
+            Promjena mjeseca automatski osvježava cijelu stranicu i sve podatke se računaju za taj period
+            (od 1. do posljednjeg dana izabranog mjeseca).
+        </p>
+
+        <h3>Pregled stranice</h3>
+        <div class="report-preview">┌─────────────────────────────────────────────────┐
+│  Izvještaj o zauzetosti          [Izbor mjeseca]│
+├─────────────────────────────────────────────────┤
+│  [12.5%]    [45]        [315]       [1.250 €]   │
+│  Ukupna     Zauzeta     Slobodna    Prihod      │
+│  zauzetost  noćenja     noćenja     u mjesecu   │
+├─────────────────────────────────────────────────┤
+│  Zauzetost po sobama (tabela + grafikon)        │
+├─────────────────────────────────────────────────┤
+│  Rezervacije po statusu (na čekanju: 2, ...)    │
+└─────────────────────────────────────────────────┘</div>
+
+        <h3>Četiri kartice — ukupni pokazatelji</h3>
+        <table>
+            <tr><th>Pokazatelj</th><th>Opis</th><th>Kako se računa</th></tr>
+            <tr>
+                <td><strong>Ukupna zauzetost (%)</strong></td>
+                <td>Koliko su sobe bile zauzete u mjesecu</td>
+                <td>(zauzeta noćenja ÷ maks. moguća noćenja) × 100<br>Maks. = broj soba × broj dana u mjesecu</td>
+            </tr>
+            <tr>
+                <td><strong>Zauzeta noćenja</strong></td>
+                <td>Ukupan broj zauzetih dana svih soba</td>
+                <td>Zbir zauzetih dana po svakoj sobi</td>
+            </tr>
+            <tr>
+                <td><strong>Slobodna noćenja</strong></td>
+                <td>Koliko noćenja nije iskorišteno</td>
+                <td>Maks. moguća noćenja − zauzeta noćenja</td>
+            </tr>
+            <tr>
+                <td><strong>Prihod u mjesecu</strong></td>
+                <td>Ukupan prihod od rezervacija</td>
+                <td>SUM(ukupna_cijena) za potvrđene i završene rezervacije čiji je datum dolaska u tom mjesecu</td>
+            </tr>
+        </table>
+
+        <div class="info-box">
+            <strong>Napomena:</strong> U zauzetost i prihod ulaze samo rezervacije sa statusom
+            <code>potvrdena</code> i <code>zavrsena</code>.
+            Rezervacije „na čekanju" i „otkazane" se ne računaju.
+        </div>
+
+        <h3>Tabela „Zauzetost po sobama"</h3>
+        <p>Za svaku sobu posebno prikazuje:</p>
+        <table>
+            <tr><th>Kolona</th><th>Značenje</th></tr>
+            <tr><td>Soba</td><td>Naziv sobe (npr. Soba 101)</td></tr>
+            <tr><td>Tip</td><td>jednokrevetna, dvokrevetna, apartman, suite</td></tr>
+            <tr><td>Zauzeto dana</td><td>Koliko dana u mjesecu je soba bila zauzeta</td></tr>
+            <tr><td>Slobodno dana</td><td>Preostali slobodni dani u mjesecu</td></tr>
+            <tr><td>Zauzetost</td><td>Procenat zauzetosti te sobe</td></tr>
+            <tr><td>Grafikon</td><td>Vizuelna traka (progress bar) koja prikazuje isti procenat</td></tr>
+        </table>
+
+        <h3>Algoritam računanja zauzetosti po sobi</h3>
+        <p>PHP kod prolazi kroz <strong>svaki dan u mjesecu</strong> i za svaku sobu provjerava postoji li rezervacija koja pokriva taj dan:</p>
+        <pre><code>// Dan je zauzet ako:
+$trenutniDatum >= $rez['datum_od'] AND $trenutniDatum < $rez['datum_do']
+
+// Primjer: rezervacija 10.–15. juna zauzima dane 10, 11, 12, 13, 14
+// (15. je dan odlaska — soba je tada slobodna)</code></pre>
+        <p>Rezervacije se učitavaju iz baze SQL upitom:</p>
+        <pre><code>SELECT datum_od, datum_do FROM rezervacije
+WHERE soba_id = ?
+AND status IN ('potvrdena', 'zavrsena')
+AND datum_od <= ? AND datum_do > ?</code></pre>
+
+        <h3>Rezervacije po statusu</h3>
+        <p>Prikazuje koliko rezervacija ima svaki status u izabranom mjesecu (po datumu dolaska):</p>
+        <ul>
+            <li><span class="badge">Na čekanju</span> — čekaju potvrdu administratora</li>
+            <li><span class="badge">Potvrđena</span> — aktivne rezervacije</li>
+            <li><span class="badge">Otkazana</span> — otkazane rezervacije</li>
+            <li><span class="badge">Završena</span> — završen boravak</li>
+        </ul>
+        <p>Ovdje se broje <strong>sve</strong> rezervacije bez obzira na status (za razliku od zauzetosti i prihoda).</p>
+
+        <h3>Šta se računa, a šta ne</h3>
+        <table>
+            <tr><th>Status rezervacije</th><th>U zauzetost</th><th>U prihod</th><th>U statistiku statusa</th></tr>
+            <tr><td>Na čekanju</td><td>❌</td><td>❌</td><td>✅</td></tr>
+            <tr><td>Potvrđena</td><td>✅</td><td>✅</td><td>✅</td></tr>
+            <tr><td>Otkazana</td><td>❌</td><td>❌</td><td>✅</td></tr>
+            <tr><td>Završena</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        </table>
+
+        <h3>Tok podataka izvještaja</h3>
+        <div class="flow">
+            <span>Admin izabere mjesec</span>
+            <span class="arrow">→</span>
+            <span>PHP učita sve sobe</span>
+            <span class="arrow">→</span>
+            <span>Za svaku sobu: SELECT rezervacija</span>
+            <span class="arrow">→</span>
+            <span>Računanje zauzetih dana</span>
+            <span class="arrow">→</span>
+            <span>SUM prihoda iz baze</span>
+            <span class="arrow">→</span>
+            <span>Prikaz u HTML-u</span>
+        </div>
+    </section>
+
     <section id="tok">
-        <h2>7. Tok podataka — primjer rezervacije</h2>
+        <h2>8. Tok podataka — primjer rezervacije</h2>
         <div class="flow">
             <span>Korisnik otvori index.php</span>
             <span class="arrow">→</span>
@@ -743,7 +959,7 @@ const ukupno = nocenja * cijenaPoNoci;</code></pre>
     </section>
 
     <section id="pokretanje">
-        <h2>8. Pokretanje aplikacije</h2>
+        <h2>9. Pokretanje aplikacije</h2>
         <ol>
             <li>Pokreni MySQL: <code>brew services start mysql</code></li>
             <li>Instaliraj bazu (samo prvi put): <code>php setup.php</code></li>
