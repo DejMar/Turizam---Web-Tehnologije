@@ -6,26 +6,48 @@ $pageTitle = 'Pregled soba';
 
 $tip = $_GET['tip'] ?? '';
 $pretraga = trim($_GET['pretraga'] ?? '');
+$perPage = 6;
+$page = max(1, (int) ($_GET['page'] ?? 1));
 
-$sql = 'SELECT * FROM sobe WHERE dostupna = 1';
+$where = 'WHERE dostupna = 1';
 $params = [];
 
 if ($tip && in_array($tip, ['jednokrevetna', 'dvokrevetna', 'apartman', 'suite'])) {
-    $sql .= ' AND tip = ?';
+    $where .= ' AND tip = ?';
     $params[] = $tip;
 }
 
 if ($pretraga !== '') {
-    $sql .= ' AND (naziv LIKE ? OR opis LIKE ?)';
+    $where .= ' AND (naziv LIKE ? OR opis LIKE ?)';
     $params[] = "%$pretraga%";
     $params[] = "%$pretraga%";
 }
 
-$sql .= ' ORDER BY cijena_po_noci ASC';
+$countStmt = getDB()->prepare("SELECT COUNT(*) FROM sobe $where");
+$countStmt->execute($params);
+$totalSoba = (int) $countStmt->fetchColumn();
+$totalPages = max(1, (int) ceil($totalSoba / $perPage));
+$page = min($page, $totalPages);
+$offset = ($page - 1) * $perPage;
+
+$sql = "SELECT * FROM sobe $where ORDER BY cijena_po_noci ASC LIMIT $perPage OFFSET $offset";
 
 $stmt = getDB()->prepare($sql);
 $stmt->execute($params);
 $sobe = $stmt->fetchAll();
+
+function paginationUrl(int $pageNum, string $tipFilter, string $pretragaFilter): string
+{
+    $query = ['page' => $pageNum];
+    if ($tipFilter !== '') {
+        $query['tip'] = $tipFilter;
+    }
+    if ($pretragaFilter !== '') {
+        $query['pretraga'] = $pretragaFilter;
+    }
+
+    return 'index.php?' . http_build_query($query);
+}
 
 require_once __DIR__ . '/includes/header.php';
 ?>
@@ -66,6 +88,13 @@ require_once __DIR__ . '/includes/header.php';
         <p>Nema soba koje odgovaraju vašim kriterijumima.</p>
     </div>
 <?php else: ?>
+    <p class="results-info">
+        Prikazano <?= count($sobe) ?> od <?= $totalSoba ?> soba
+        <?php if ($totalPages > 1): ?>
+            — stranica <?= $page ?> / <?= $totalPages ?>
+        <?php endif; ?>
+    </p>
+
     <div class="room-grid">
         <?php foreach ($sobe as $soba): ?>
             <article class="room-card">
@@ -88,6 +117,27 @@ require_once __DIR__ . '/includes/header.php';
             </article>
         <?php endforeach; ?>
     </div>
+
+    <?php if ($totalPages > 1): ?>
+        <nav class="pagination" aria-label="Stranice">
+            <?php if ($page > 1): ?>
+                <a href="<?= e(paginationUrl($page - 1, $tip, $pretraga)) ?>" class="pagination-btn">&larr; Prethodna</a>
+            <?php endif; ?>
+
+            <div class="pagination-pages">
+                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                    <a href="<?= e(paginationUrl($i, $tip, $pretraga)) ?>"
+                       class="pagination-page <?= $i === $page ? 'active' : '' ?>">
+                        <?= $i ?>
+                    </a>
+                <?php endfor; ?>
+            </div>
+
+            <?php if ($page < $totalPages): ?>
+                <a href="<?= e(paginationUrl($page + 1, $tip, $pretraga)) ?>" class="pagination-btn">Sljedeća &rarr;</a>
+            <?php endif; ?>
+        </nav>
+    <?php endif; ?>
 <?php endif; ?>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

@@ -410,6 +410,57 @@ body {
     flex: 1;
 }
 
+.results-info {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+    padding: 1rem 0;
+}
+
+.pagination-pages {
+    display: flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+}
+
+.pagination-page,
+.pagination-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 0.75rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--white);
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.pagination-page:hover,
+.pagination-btn:hover {
+    background: var(--primary-light);
+    border-color: var(--primary);
+}
+
+.pagination-page.active {
+    background: var(--primary);
+    color: var(--white);
+    border-color: var(--primary);
+}
+
 /* Room detail */
 .room-detail {
     max-width: 900px;

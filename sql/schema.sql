@@ -54,4 +54,10 @@ INSERT INTO sobe (naziv, opis, tip, kapacitet, cijena_po_noci, slika) VALUES
 ('Soba 201', 'Luksuzni apartman sa dnevnom sobom i kuhinjom. Pogled na more.', 'apartman', 4, 120.00, 'soba3.jpg'),
 ('Suite 301', 'Premium suite sa jacuzzi kupatilom i panoramskim pogledom.', 'suite', 2, 180.00, 'soba4.jpg'),
 ('Soba 103', 'Ekonomična dvokrevetna soba, savršena za kraći boravak.', 'dvokrevetna', 2, 55.00, 'soba5.jpg'),
-('Soba 202', 'Porodični apartman sa dva spavaća mjesta.', 'apartman', 5, 140.00, 'soba6.jpg');
+('Soba 202', 'Porodični apartman sa dva spavaća mjesta.', 'apartman', 5, 140.00, 'soba6.jpg'),
+('Soba 104', 'Kompaktna jednokrevetna soba u prizemlju, blizu recepcije.', 'jednokrevetna', 1, 40.00, 'soba7.jpg'),
+('Soba 203', 'Dvokrevetna soba sa terasom i pogledom na baštu.', 'dvokrevetna', 2, 80.00, 'soba8.jpg'),
+('Apartman 302', 'Moderan apartman sa potpuno opremljenom kuhinjom.', 'apartman', 3, 110.00, 'soba9.jpg'),
+('Suite 401', 'Ekskluzivni suite sa odvojenim dnevnim boravkom.', 'suite', 3, 200.00, 'soba10.jpg'),
+('Soba 105', 'Tiha jednokrevetna soba sa radnim stolom.', 'jednokrevetna', 1, 50.00, 'soba11.jpg'),
+('Soba 204', 'Prostrana dvokrevetna soba pogodna za poslovne putnike.', 'dvokrevetna', 2, 70.00, 'soba12.jpg');
