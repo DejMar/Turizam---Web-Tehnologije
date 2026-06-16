@@ -60,8 +60,8 @@ Otvorite [http://localhost:8000](http://localhost:8000)
 
 | Uloga | Email | Lozinka |
 |-------|-------|---------|
-| Admin | admin@turizam.rs | admin123 |
-| Gost | gost@turizam.rs | gost123 |
+| Admin | admin@turizam.ba | admin123 |
+| Gost | gost@turizam.ba | gost123 |
 
 ## Struktura projekta
 
