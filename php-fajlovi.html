@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHP fajlovi - Turizam Rezervacija Soba</title>
+    <style>
+        :root {
+            --primary: #1a5f7a;
+            --primary-dark: #134a61;
+            --primary-light: #e8f4f8;
+            --text: #2c3e50;
+            --text-muted: #5d6d7e;
+            --border: #dfe6e9;
+            --bg: #f8fafb;
+            --white: #ffffff;
+            --code-bg: #1e2a32;
+            --code-text: #e8edf2;
+            --public: #2d8a4e;
+            --auth: #d68910;
+            --admin: #8e44ad;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            line-height: 1.7;
+        }
+
+        .docs-header {
+            background: var(--primary);
+            color: var(--white);
+            padding: 2.5rem 1.5rem;
+        }
+
+        .docs-header .inner { max-width: 1000px; margin: 0 auto; }
+        .docs-header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .docs-header p { opacity: 0.9; }
+
+        .docs-nav {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .docs-nav .inner {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            gap: 0.75rem 1rem;
+            flex-wrap: wrap;
+        }
+
+        .docs-nav a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .docs-nav a:hover { text-decoration: underline; }
+
+        .docs-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        section {
+            background: var(--white);
+            border-radius: 10px;
+            padding: 1.75rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        h2 {
+            color: var(--primary);
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        h3 {
+            font-size: 1.05rem;
+            margin: 1.25rem 0 0.5rem;
+            color: var(--primary-dark);
+        }
+
+        p { margin-bottom: 0.75rem; }
+        ul, ol { margin: 0.5rem 0 1rem 1.5rem; }
+        li { margin-bottom: 0.35rem; }
+
+        .php-file {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .php-file-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 1.25rem;
+            background: var(--primary-light);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .php-file-header h3 {
+            margin: 0;
+            font-family: 'Consolas', monospace;
+            font-size: 1.1rem;
+            color: var(--primary-dark);
+            flex: 1;
+        }
+
+        .php-file-body { padding: 1.25rem; }
+
+        .tag {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .tag-public { background: #d4edda; color: var(--public); }
+        .tag-auth { background: #fff3cd; color: var(--auth); }
+        .tag-admin { background: #e8daef; color: var(--admin); }
+        .tag-include { background: #d1ecf1; color: #0c5460; }
+        .tag-cli { background: #f8d7da; color: #721c24; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.75rem 0;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.55rem 0.75rem;
+            text-align: left;
+        }
+
+        th { background: var(--primary-light); font-weight: 600; }
+
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.82rem;
+            line-height: 1.5;
+            margin: 0.75rem 0;
+        }
+
+        code {
+            font-family: 'Consolas', monospace;
+            background: var(--primary-light);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.88em;
+        }
+
+        pre code { background: none; padding: 0; }
+
+        .info-box {
+            background: var(--primary-light);
+            border-left: 4px solid var(--primary);
+            padding: 0.85rem 1rem;
+            border-radius: 0 8px 8px 0;
+            margin: 0.75rem 0;
+            font-size: 0.95rem;
+        }
+
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .toc-grid a {
+            display: block;
+            padding: 0.65rem 0.85rem;
+            background: var(--primary-light);
+            border-radius: 6px;
+            color: var(--primary);
+            text-decoration: none;
+            font-family: monospace;
+            font-size: 0.88rem;
+        }
+
+        .toc-grid a:hover { background: #d4e8f0; }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.6rem 1.25rem;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .back-btn:hover { background: var(--primary-dark); }
+
+        .code-explain {
+            margin: 1rem 0;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .code-explain pre {
+            margin: 0;
+            border-radius: 0;
+        }
+
+        .code-explain .explain {
+            padding: 0.85rem 1rem;
+            background: #fafcfd;
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .code-explain .explain strong {
+            color: var(--primary-dark);
+        }
+
+        h4.code-title {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin: 1rem 0 0.5rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<header class="docs-header">
+    <div class="inner">
+        <h1>PHP fajlovi — detaljno objašnjenje</h1>
+        <p>Šta radi svaki PHP fajl u projektu Turizam — Rezervacija Soba</p>
+    </div>
+</header>
+
+<nav class="docs-nav">
+    <div class="inner">
+        <a href="#pregled">Pregled</a>
+        <a href="#config">config/</a>
+        <a href="#includes">includes/</a>
+        <a href="#javni">Javne stranice</a>
+        <a href="#admin">admin/</a>
+        <a href="#setup">setup.php</a>
+        <a href="dokumentacija.html">Glavna dokumentacija</a>
+        <a href="index.php">← Aplikacija</a>
+    </div>
+</nav>
+
+<main class="docs-content">
+
+    <section id="pregled">
+        <h2>Pregled — 18 PHP fajlova</h2>
+        <p>Projekat ima <strong>18 PHP fajlova</strong> organizovanih u 4 grupe. Za svaki fajl ispod nalazi se opis funkcionalnosti i <strong>objašnjenje ključnih dijelova koda</strong>.</p>
+
+        <div class="toc-grid">
+            <a href="#database">config/database.php</a>
+            <a href="#auth">includes/auth.php</a>
+            <a href="#header">includes/header.php</a>
+            <a href="#footer">includes/footer.php</a>
+            <a href="#index">index.php</a>
+            <a href="#soba">soba.php</a>
+            <a href="#rezervacija">rezervacija.php</a>
+            <a href="#login">login.php</a>
+            <a href="#register">register.php</a>
+            <a href="#logout">logout.php</a>
+            <a href="#moje">moje-rezervacije.php</a>
+            <a href="#admin-index">admin/index.php</a>
+            <a href="#admin-rez">admin/rezervacije.php</a>
+            <a href="#admin-sobe">admin/sobe.php</a>
+            <a href="#admin-kor">admin/korisnici.php</a>
+            <a href="#admin-izv">admin/izvjestaji.php</a>
+            <a href="#sidebar">admin/includes/sidebar.php</a>
+            <a href="#setup">setup.php</a>
+        </div>
+    </section>
+
+    <!-- CONFIG -->
+    <section id="config">
+        <h2>config/ — Konfiguracija</h2>
+
+        <article class="php-file" id="database">
+            <div class="php-file-header">
+                <h3>config/database.php</h3>
+                <span class="tag tag-include">Include</span>
+            </div>
+            <div class="php-file-body">
+                <p><strong>Svrha:</strong> Centralna konfiguracija aplikacije i pomoćne funkcije koje koriste svi ostali fajlovi.</p>
+
+                <h3>Šta sadrži</h3>
+                <table>
+                    <tr><th>Element</th><th>Opis</th></tr>
+                    <tr><td><code>DB_HOST, DB_NAME, DB_USER, DB_PASS</code></td><td>Podaci za konekciju na MySQL</td></tr>
+                    <tr><td><code>APP_NAME, APP_URL</code></td><td>Naziv aplikacije i bazni URL</td></tr>
+                    <tr><td><code>getDB()</code></td><td>Kreira PDO konekciju (singleton — jedna po zahtjevu)</td></tr>
+                    <tr><td><code>e()</code></td><td>Escape HTML — zaštita od XSS</td></tr>
+                    <tr><td><code>formatDate()</code></td><td>Formatira datum u <code>dd.mm.yyyy</code></td></tr>
+                    <tr><td><code>formatPrice()</code></td><td>Formatira cijenu u evre</td></tr>
+                    <tr><td><code>tipSobeLabel()</code></td><td>Prijevod tipa sobe na srpski</td></tr>
+                    <tr><td><code>statusRezervacijeLabel()</code></td><td>Prijevod statusa rezervacije</td></tr>
+                    <tr><td><code>redirect()</code></td><td>Preusmjerava na drugu stranicu i zaustavlja izvršavanje</td></tr>
+                    <tr><td><code>flash() / getFlash()</code></td><td>Poruke korisniku nakon preusmjeravanja</td></tr>
+                    <tr><td><code>nazivMjeseca()</code></td><td>Formatira <code>YYYY-MM</code> u „Juni 2026"</td></tr>
+                </table>
+
+                <p><strong>Ko ga koristi:</strong> Uključuje se iz <code>includes/auth.php</code> i direktno iz <code>setup.php</code>.</p>
+
+                <h3>Objašnjenje koda</h3>
+
+                <h4 class="code-title">Konstante za konekciju</h4>
+                <div class="code-explain">
+<pre><code>define('DB_HOST', 'localhost');
+define('DB_NAME', 'turizam_sobe');
+define('DB_USER', 'root');
+define('DB_PASS', '');</code></pre>
+                    <div class="explain"><strong>define()</strong> kreira konstante koje se ne mogu mijenjati tokom izvršavanja. Svi fajlovi koriste iste podatke za pristup MySQL bazi.</div>
+                </div>
+
+                <h4 class="code-title">Funkcija getDB() — konekcija na bazu</h4>
+                <div class="code-explain">
+<pre><code>function getDB(): PDO {
+    static $pdo = null;           // čuva konekciju između poziva
+    if ($pdo === null) {
+        $dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . '...';
+        $pdo = new PDO($dsn, DB_USER, DB_PASS, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        ]);
+    }
+    return $pdo;
+}</code></pre>
+                    <div class="explain"><strong>static $pdo</strong> — singleton pattern: konekcija se kreira samo jednom. <strong>PDO::ERRMODE_EXCEPTION</strong> baca grešku ako SQL ne uspije. <strong>FETCH_ASSOC</strong> vraća rezultate kao asocijativni niz (npr. <code>$row['naziv']</code>).</div>
+                </div>
+
+                <h4 class="code-title">Funkcija e() — zaštita od XSS</h4>
+                <div class="code-explain">
+<pre><code>function e(string $value): string {
+    return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+}</code></pre>
+                    <div class="explain">Pretvara specijalne HTML znakove (<code>&lt;</code>, <code>&gt;</code>, <code>"</code>) u sigurne entitete. Koristi se pri ispisu korisničkih podataka: <code>&lt;?= e($soba['naziv']) ?&gt;</code> — sprečava ubacivanje zlonamjernog JavaScripta.</div>
+                </div>
+
+                <h4 class="code-title">Flash poruke</h4>
+                <div class="code-explain">
+<pre><code>function flash(string $type, string $message): void {
+    $_SESSION['flash'] = ['type' => $type, 'message' => $message];
+}
+
+function getFlash(): ?array {
+    if (!isset($_SESSION['flash'])) return null;
+    $flash = $_SESSION['flash'];
+    unset($_SESSION['flash']);    // briše nakon čitanja — prikaže se samo jednom
+    return $flash;
+}</code></pre>
+                    <div class="explain">Flash poruka se sprema u sesiju prije <code>redirect()</code>, a prikazuje na sljedećoj stranici u <code>header.php</code>. <code>unset()</code> osigurava da se poruka ne prikaže ponovo pri osvježavanju.</div>
+                </div>
+            </div>
+        </article>
+    </section>
+
+    <!-- INCLUDES -->
+    <section id="includes">
+        <h2>includes/ — Zajednički moduli</h2>
+
+        <article class="php-file" id="auth">
+            <div class="php-file-header">
+                <h3>includes/auth.php</h3>
+                <span class="tag tag-include">Include</span>
+            </div>
+            <div class="php-file-body">
+                <p><strong>Svrha:</strong> Autentifikacija, autorizacija i poslovna logika vezana za korisnike i rezervacije.</p>
+                <p>Na početku poziva <code>session_start()</code> i učitava <code>database.php</code>.</p>
+
+                <h3>Funkcije</h3>
+                <table>
+                    <tr><th>Funkcija</th><th>Šta radi</th></tr>
+                    <tr><td><code>isLoggedIn()</code></td><td>Provjerava da li postoji <code>$_SESSION['korisnik_id']</code></td></tr>
+                    <tr><td><code>currentUser()</code></td><td>Učitava podatke prijavljenog korisnika iz baze</td></tr>
+                    <tr><td><code>isAdmin()</code></td><td>Provjerava da li je uloga <code>admin</code></td></tr>
+                    <tr><td><code>requireLogin()</code></td><td>Blokira stranicu ako korisnik nije prijavljen → redirect na login</td></tr>
+                    <tr><td><code>requireAdmin()</code></td><td>Blokira stranicu ako korisnik nije admin → redirect na index</td></tr>
+                    <tr><td><code>login()</code></td><td>Provjerava email/lozinku sa <code>password_verify()</code></td></tr>
+                    <tr><td><code>logout()</code></td><td>Briše sesiju</td></tr>
+                    <tr><td><code>registerUser()</code></td><td>Validira i registruje novog korisnika (uloga: gost)</td></tr>
+                    <tr><td><code>sobaJeDostupna()</code></td><td>SQL provjera da li soba ima preklapajuće rezervacije</td></tr>
+                    <tr><td><code>izracunajCijenu()</code></td><td>Broj noćenja × cijena po noći</td></tr>
+                </table>
+
+                <p><strong>Ko ga koristi:</strong> Skoro svaka stranica u projektu — <code>require_once 'includes/auth.php'</code></p>
+
+                <h3>Objašnjenje koda</h3>
+
+                <h4 class="code-title">Pokretanje sesije</h4>
+                <div class="code-explain">
+<pre><code>session_start();
+require_once __DIR__ . '/../config/database.php';</code></pre>
+                    <div class="explain"><strong>session_start()</strong> mora biti prije bilo kakvog HTML outputa. Omogućava čuvanje <code>$_SESSION</code> podataka (npr. ID prijavljenog korisnika) između učitavanja stranica.</div>
+                </div>
+
+                <h4 class="code-title">Provjera prijave i uloge</h4>
+                <div class="code-explain">
+<pre><code>function isLoggedIn(): bool {
+    return isset($_SESSION['korisnik_id']);
+}
+
+function requireAdmin(): void {
+    requireLogin();
+    if (!isAdmin()) {
+        flash('error', 'Nemate dozvolu...');
+        redirect('index.php');
+    }
+}</code></pre>
+                    <div class="explain"><strong>isset()</strong> provjerava da li je korisnik prijavljen. <strong>requireAdmin()</strong> prvo poziva <code>requireLogin()</code>, pa tek onda provjerava ulogu — dvostruka zaštita admin stranica.</div>
+                </div>
+
+                <h4 class="code-title">Funkcija login()</h4>
+                <div class="code-explain">
+<pre><code>function login(string $email, string $password): bool {
+    $stmt = getDB()->prepare('SELECT * FROM korisnici WHERE email = ? AND aktivan = 1');
+    $stmt->execute([$email]);
+    $user = $stmt->fetch();
+
+    if ($user && password_verify($password, $user['lozinka'])) {
+        $_SESSION['korisnik_id'] = $user['id'];
+        $_SESSION['uloga'] = $user['uloga'];
+        return true;
+    }
+    return false;
+}</code></pre>
+                    <div class="explain"><strong>prepare() + execute([$email])</strong> — prepared statement štiti od SQL injection. <strong>password_verify()</strong> upoređuje unesenu lozinku sa hašom iz baze. Uspjeh → ID korisnika ide u sesiju.</div>
+                </div>
+
+                <h4 class="code-title">Provjera dostupnosti sobe</h4>
+                <div class="code-explain">
+<pre><code>function sobaJeDostupna(int $sobaId, string $datumOd, string $datumDo): bool {
+    $sql = "SELECT COUNT(*) FROM rezervacije
+            WHERE soba_id = ?
+            AND status IN ('na_cekanju', 'potvrdena')
+            AND datum_od < ? AND datum_do > ?";
+    $stmt->execute([$sobaId, $datumDo, $datumOd]);
+    return (int) $stmt->fetchColumn() === 0;
+}</code></pre>
+                    <div class="explain">Traži preklapajuće rezervacije. Uslov <code>datum_od &lt; datumDo AND datum_do &gt; datumOd</code> detektuje bilo koje preklapanje perioda. Vraća <code>true</code> ako je COUNT = 0 (soba slobodna).</div>
+                </div>
+
+                <h4 class="code-title">Izračun cijene</h4>
+                <div class="code-explain">
+<pre><code>function izracunajCijenu(float $cijenaPoNoci, string $datumOd, string $datumDo): float {
+    $od = new DateTime($datumOd);
+    $do = new DateTime($datumDo);
+    $nocenja = max(1, (int) $od->diff($do)->days);
+    return $nocenja * $cijenaPoNoci;
+}</code></pre>
+                    <div class="explain"><strong>DateTime::diff()</strong> računa razliku između datuma. <strong>max(1, ...)</strong> osigurava minimum 1 noć. Rezultat: broj noćenja × cijena po noći.</div>
+                </div>
+            </div>
+        </article>
+
+        <article class="php-file" id="header">
+            <div class="php-file-header">
+                <h3>includes/header.php</h3>
+                <span class="tag tag-include">Include</span>
+            </div>
+            <div class="php-file-body">
+                <p><strong>Svrha:</strong> Zajednički HTML početak svake stranice.</p>
+                <ul>
+                    <li>Generiše <code>&lt;!DOCTYPE html&gt;</code>, <code>&lt;head&gt;</code> sa CSS linkom</li>
+                    <li>Prikazuje header sa logom i navigacijom</li>
+                    <li>Dinamički meni — različit za prijavljene/neprijavljene korisnike</li>
+                    <li>Admin vidi link „Administracija"</li>
+                    <li>Prikazuje flash poruke (uspjeh/greška)</li>
+                    <li>Otvara <code>&lt;main&gt;</code> i <code>&lt;div class="container"&gt;</code></li>
+                </ul>
+                <p><strong>Očekuje varijable:</strong> <code>$currentPage</code>, <code>$pageTitle</code> (opciono)</p>
+
+                <h3>Objašnjenje koda</h3>
+
+                <h4 class="code-title">Dinamička navigacija</h4>
+                <div class="code-explain">
+<pre><code>$currentPage = $currentPage ?? '';   // ?? daje default ako varijabla nije postavljena
+$user = currentUser();
+
+&lt;?php if ($user): ?&gt;
+    &lt;a href="moje-rezervacije.php"&gt;Moje rezervacije&lt;/a&gt;
+    &lt;?php if (isAdmin()): ?&gt;
+        &lt;a href="admin/index.php"&gt;Administracija&lt;/a&gt;
+    &lt;?php endif; ?&gt;
+&lt;?php else: ?&gt;
+    &lt;a href="login.php"&gt;Prijava&lt;/a&gt;
+&lt;?php endif; ?&gt;</code></pre>
+                    <div class="explain"><strong>if ($user)</strong> — prikazuje različit meni za prijavljene i neprijavljene. <strong>??</strong> (null coalescing) postavlja prazan string ako <code>$currentPage</code> nije definisan. <strong>str_starts_with()</strong> u drugim dijelovima označava aktivnu stavku menija.</div>
+                </div>
+
+                <h4 class="code-title">Prikaz flash poruke</h4>
+                <div class="code-explain">
+<pre><code>&lt;?php $flash = getFlash(); if ($flash): ?&gt;
+    &lt;div class="alert alert-&lt;?= e($flash['type']) ?&gt;"&gt;
+        &lt;?= e($flash['message']) ?&gt;
+    &lt;/div&gt;
+&lt;?php endif; ?&gt;</code></pre>
+                    <div class="explain">Ako postoji flash poruka iz sesije, prikazuje je kao zelenu (success) ili crvenu (error) traku. <code>e()</code> štiti od XSS u poruci.</div>
+                </div>
+            </div>
+        </article>
+
+        <article class="php-file" id="footer">
+            <div class="php-file-header">
+                <h3>includes/footer.php</h3>
+                <span class="tag tag-include">Include</span>
+            </div>
+            <div class="php-file-body">
+                <p><strong>Svrha:</strong> Zajednički HTML kraj svake stranice.</p>
+                <ul>
+                    <li>Zatvara <code>&lt;main&gt;</code> i container</li>
+                    <li>Prikazuje footer sa copyright tekstom</li>
+                    <li>Učitava <code>assets/js/main.js</code></li>
+                    <li>Zatvara <code>&lt;body&gt;</code> i <code>&lt;html&gt;</code></li>
+                </ul>
+
+                <h3>Objašnjenje koda</h3>
+                <div class="code-explain">
+<pre><code>    &lt;/div&gt;   &lt;!-- zatvara .container --&gt;
+&lt;/main&gt;
+
+&lt;footer class="footer"&gt;
+    &lt;p&gt;&amp;copy; &lt;?= date('Y') ?&gt; &lt;?= e(APP_NAME) ?&gt;&lt;/p&gt;
+&lt;/footer&gt;
+
+&lt;script src="&lt;?= e(APP_URL) ?&gt;assets/js/main.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+                    <div class="explain">Footer zatvara HTML strukturu otvorenu u header.php. <strong>date('Y')</strong> automatski prikazuje tekuću godinu. JS se učitava na kraju stranice da DOM bude spreman prije izvršavanja skripti.</div>
+                </div>
+            </div>
+        </article>
+    </section>
+
+    <!-- JAVNE STRANICE -->
+    <section id="javni">
+        <h2>Javne stranice (root)</h2>
+
+        <article class="php-file" id="index">
+            <div class="php-file-header">
+                <h3>index.php</h3>
+                <span class="tag tag-public">Javno</span>
+            </div>
+            <div class="php-file-body">
+                <p><strong>Svrha:</strong> Početna stranica — pregled dostupnih soba sa filtriranjem i paginacijom.</p>
+
+                <h3>GET parametri</h3>
+                <table>
+                    <tr><th>Parametar</th><th>Opis</th></tr>
+                    <tr><td><code>tip</code></td><td>Filter po tipu sobe</td></tr>
+                    <tr><td><code>pretraga</code></td><td>Pretraga po nazivu ili opisu</td></tr>
+                    <tr><td><code>page</code></td><td>Broj stranice (6 soba po stranici)</td></tr>
+                </table>
+
+                <h3>Tok izvršavanja</h3>
+                <ol>
+                    <li>Učitava <code>auth.php</code></li>
+                    <li>Gradi dinamički SQL upit sa WHERE klauzulama</li>
+                    <li>Broji ukupan broj soba (COUNT)</li>
+                    <li>Učitava sobe sa LIMIT/OFFSET za paginaciju</li>
+                    <li>Prikazuje filter formu, kartice soba i navigaciju stranica</li>
+                </ol>
+
+                <p><strong>Baza:</strong> SELECT iz tabele <code>sobe</code> (samo <code>dostupna = 1</code>)</p>
+
+                <h3>Objašnjenje koda</h3>
+
+                <h4 class="code-title">Čitanje filtera iz URL-a</h4>
+                <div class="code-explain">
+<pre><code>$tip = $_GET['tip'] ?? '';
+$pretraga = trim($_GET['pretraga'] ?? '');
+$page = max(1, (int) ($_GET['page'] ?? 1));</code></pre>
+                    <div class="explain"><strong>$_GET</strong> sadrži parametre iz URL-a (npr. <code>?tip=apartman&page=2</code>). <strong>?? ''</strong> daje prazan string ako parametar ne postoji. <strong>max(1, ...)</strong> sprečava negativne stranice.</div>
+                </div>
+
+                <h4 class="code-title">Dinamički SQL upit</h4>
+                <div class="code-explain">
+<pre><code>$where = 'WHERE dostupna = 1';
+$params = [];
+
+if ($tip && in_array($tip, ['jednokrevetna', 'dvokrevetna', ...])) {
+    $where .= ' AND tip = ?';
+    $params[] = $tip;
+}
+
+$countStmt = getDB()->prepare("SELECT COUNT(*) FROM sobe $where");
+$countStmt->execute($params);
+$totalSoba = (int) $countStmt->fetchColumn();
+
+$sql = "SELECT * FROM sobe $where ORDER BY cijena_po_noci ASC LIMIT 6 OFFSET $offset";
+$stmt->execute($params);</code></pre>
+                    <div class="explain"><strong>in_array()</strong> validira tip — samo dozvoljene vrijednosti idu u SQL. <strong>?</strong> placeholderi + <strong>$params</strong> štite od SQL injection. LIMIT/OFFSET su cijeli brojevi iz koda (ne iz korisničkog unosa). <strong>fetchColumn()</strong> vraća jedan broj (COUNT).</div>
+                </div>
+
+                <h4 class="code-title">Prikaz soba u HTML-u (petlja)</h4>
+                <div class="code-explain">
+<pre><code>&lt;?php foreach ($sobe as $soba): ?&gt;
+    &lt;h2&gt;&lt;?= e($soba['naziv']) ?&gt;&lt;/h2&gt;
+    &lt;a href="rezervacija.php?soba_id=&lt;?= (int) $soba['id'] ?&gt;"&gt;Rezerviši&lt;/a&gt;
+&lt;?php endforeach; ?&gt;</code></pre>
+                    <div class="explain"><strong>foreach</strong> prolazi kroz niz soba iz baze. <strong>&lt;?= ... ?&gt;</strong> je kratki echo. <strong>(int)</strong> cast osigurava da je ID broj u URL-u. <strong>e()</strong> štiti naziv sobe od XSS.</div>
+                </div>
+            </div>
+        </article>
+
+        <article class="php-file" id="soba">
+            <div class="php-file-header">
+                <h3>soba.php</h3>
+                <span class="tag tag-public">Javno</span>
+            </div>
+            <div class="php-file-body">
+                <p><strong>Svrha:</strong> Detaljan prikaz jedne sobe.</p>
+
+                <h3>GET parametri</h3>
+                <table>
+                    <tr><th>Parametar</th><th>Opis</th></tr>
+                    <tr><td><code>id</code></td><td>ID sobe (obavezno)</td></tr>
+                </table>
+
+                <h3>Tok izvršavanja</h3>
+                <ol>
+                    <li>Učitava sobu iz baze po ID-u</li>
+                    <li>Ako soba ne postoji ili nije dostupna → flash poruka i redirect na index</li>
+                    <li>Prikazuje pun opis, kapacitet, cijenu i dugme „Rezerviši"</li>
+                </ol>
+
+                <p><strong>Baza:</strong> SELECT iz <code>sobe</code> WHERE id = ? AND dostupna = 1</p>
+
+                <h3>Objašnjenje koda</h3>
+                <div class="code-explain">
+<pre><code>$id = (int) ($_GET['id'] ?? 0);
+
+$stmt = getDB()->prepare('SELECT * FROM sobe WHERE id = ? AND dostupna = 1');
+$stmt->execute([$id]);
+$soba = $stmt->fetch();
+
+if (!$soba) {
+    flash('error', 'Soba nije pronađena.');
+    redirect('index.php');
+}</code></pre>
+                    <div class="explain"><strong>(int)</strong> pretvara GET parametar u broj — zaštita od injection. <strong>fetch()</strong> vraća jedan red ili <code>false</code> ako nema rezultata. <strong>if (!$soba)</strong> preusmjerava korisnika ako soba ne postoji ili nije dostupna.</div>
+                </div>
+            </div>
+        </article>
+
+        <article class="php-file" id="rezervacija">
+            <div class="php-file-header">
+                <h3>rezervacija.php</h3>
+                <span class="tag tag-auth">Zahtijeva prijavu</span>
+            </div>
+            <div class="php-file-body">
+                <p><strong>Svrha:</strong> Online rezervacija sobe — forma i obrada zahtjeva.</p>
+
+                <h3>Parametri</h3>
+                <table>
+                    <tr><th>Metoda</th><th>Parametar</th><th>Opis</th></tr>
+                    <tr><td>GET</td><td><code>soba_id</code></td><td>ID sobe za rezervaciju</td></tr>
+                    <tr><td>POST</td><td><code>soba_id</code></td><td>ID sobe (hidden polje)</td></tr>
+                    <tr><td>POST</td><td><code>datum_od</code></td><td>Datum dolaska</td></tr>
+                    <tr><td>POST</td><td><code>datum_do</code></td><td>Datum odlaska</td></tr>
+                    <tr><td>POST</td><td><code>broj_gostiju</code></td><td>Broj gostiju</td></tr>
+                    <tr><td>POST</td><td><code>napomena</code></td><td>Opcionalna napomena</td></tr>
+                </table>
+
+                <h3>Validacija (POST)</h3>
+                <ul>
+                    <li>Datumi moraju biti uneseni, dolazak prije odlaska, ne u prošlosti</li>
+                    <li>Broj gostiju unutar kapaciteta sobe</li>
+                    <li><code>sobaJeDostupna()</code> — nema preklapanja sa drugim rezervacijama</li>
+                </ul>
+
+                <h3>Uspešna rezervacija</h3>
+                <p>INSERT u <code>rezervacije</code> sa statusom <code>na_cekanju</code>, zatim redirect na <code>moje-rezervacije.php</code>.</p>
+
+                <p><strong>Baza:</strong> SELECT iz <code>sobe</code>, INSERT u <code>rezervacije</code></p>
+
+                <h3>Objašnjenje koda</h3>
+
+                <h4 class="code-title">Zaštita stranice</h4>
+                <div class="code-explain">
+<pre><code>requireLogin();   // nije prijavljen → redirect na login.php
+
+$sobaId = (int) ($_GET['soba_id'] ?? $_POST['soba_id'] ?? 0);</code></pre>
+                    <div class="explain">Rezervacija zahtijeva prijavu. ID sobe se čita i iz GET (otvaranje forme) i iz POST (slanje forme) pomoću lančanog <strong>??</strong>.</div>
+                </div>
+
+                <h4 class="code-title">Validacija i INSERT</h4>
+                <div class="code-explain">
+<pre><code>if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $datumOd = $_POST['datum_od'] ?? '';
+    // ... validacija datuma, kapaciteta ...
+
+    if (empty($errors) && !sobaJeDostupna($sobaId, $datumOd, $datumDo)) {
+        $errors[] = 'Soba nije dostupna u izabranom periodu.';
+    }
+
+    if (empty($errors)) {
+        $ukupnaCijena = izracunajCijenu(...);
+        $stmt = getDB()->prepare('INSERT INTO rezervacije (...) VALUES (?, ?, ...)');
+        $stmt->execute([$_SESSION['korisnik_id'], $sobaId, ...]);
+        flash('success', 'Rezervacija je uspješno poslata.');
+        redirect('moje-rezervacije.php');
+    }
+}</code></pre>
+                    <div class="explain"><strong>$_SERVER['REQUEST_METHOD'] === 'POST'</strong> razlikuje slanje forme od običnog otvaranja stranice. Greške se skupljaju u niz <code>$errors</code>. <strong>$_SESSION['korisnik_id']</strong> povezuje rezervaciju sa prijavljenim korisnikom. Status ostaje default <code>na_cekanju</code> iz baze.</div>
+                </div>
+            </div>
+        </article>
+
+        <article class="php-file" id="login">
+            <div class="php-file-header">
+                <h3>login.php</h3>
+                <span class="tag tag-public">Javno</span>
+            </div>
+            <div class="php-file-body">
+                <p><strong>Svrha:</strong> Prijava korisnika u sistem.</p>
+
+                <h3>POST parametri</h3>
+                <table>
+                    <tr><th>Polje</th><th>Opis</th></tr>
+                    <tr><td><code>email</code></td><td>Email adresa</td></tr>
+                    <tr><td><code>password</code></td><td>Lozinka</td></tr>
+                </table>
+
+                <h3>Tok</h3>
+                <ol>
+                    <li>Ako je već prijavljen → redirect (admin na admin panel, gost na index)</li>
+                    <li>POST: poziva <code>login()</code> iz auth.php</li>
+                    <li>Uspjeh → postavlja sesiju, redirect sa flash porukom</li>
+                    <li>Neuspjeh → flash greška „Pogrešan email ili lozinka"</li>
+                </ol>
+
+                <p><strong>Baza:</strong> SELECT iz <code>korisnici</code> (u funkciji login)</p>
+
+                <h3>Objašnjenje koda</h3>
+                <div class="code-explain">
+<pre><code>if (isLoggedIn()) {
+    redirect(isAdmin() ? 'admin/index.php' : 'index.php');
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = trim($_POST['email'] ?? '');
+    $password = $_POST['password'] ?? '';
+
+    if (login($email, $password)) {
+        flash('success', 'Uspješno ste se prijavili.');
+        redirect(isAdmin() ? 'admin/index.php' : 'index.php');
+    }
+    flash('error', 'Pogrešan email ili lozinka.');
+}</code></pre>
+                    <div class="explain">Već prijavljeni korisnici se odmah preusmjeravaju. <strong>trim()</strong> uklanja razmake sa emaila. <strong>login()</strong> vraća true/false — na osnovu toga se bira flash poruka i redirect. Admin ide na panel, gost na početnu.</div>
+                </div>
+            </div>
+        </article>
+
+        <article class="php-file" id="register">
+            <div class="php-file-header">
+                <h3>register.php</h3>
+                <span class="tag tag-public">Javno</span>
+            </div>
+            <div class="php-file-body">
+                <p><strong>Svrha:</strong> Registracija novog korisnika (uloga: gost).</p>
+
+                <h3>POST parametri</h3>
+                <table>
+                    <tr><th>Polje</th><th>Opis</th></tr>
+                    <tr><td><code>ime</code>, <code>prezime</code></td><td>Lični podaci</td></tr>
+                    <tr><td><code>email</code></td><td>Email (mora biti jedinstven)</td></tr>
+                    <tr><td><code>password</code></td><td>Lozinka (min. 6 znakova)</td></tr>
+                </table>
+
+                <p>Poziva <code>registerUser()</code> koja validira podatke, hašira lozinku i upisuje u bazu.</p>
+                <p><strong>Baza:</strong> SELECT (provjera emaila), INSERT u <code>korisnici</code></p>
+
+                <h3>Objašnjenje koda</h3>
+                <div class="code-explain">
+<pre><code>$result = registerUser(
+    trim($_POST['ime'] ?? ''),
+    trim($_POST['prezime'] ?? ''),
+    trim($_POST['email'] ?? ''),
+    $_POST['password'] ?? ''
+);
+
+if ($result['success']) {
+    flash('success', $result['message']);
+    redirect('login.php');
+}
+flash('error', $result['message']);</code></pre>
+                    <div class="explain"><strong>registerUser()</strong> vraća niz sa <code>success</code> i <code>message</code>. Unutar funkcije: validacija emaila, provjera duplikata, <strong>password_hash()</strong> za lozinku, INSERT u bazu. Nova uloga je uvijek <code>gost</code> (admin samo kroz admin panel).</div>
+                </div>
+            </div>
+        </article>
+
+        <article class="php-file" id="logout">
+            <div class="php-file-header">
+                <h3>logout.php</h3>
+                <span class="tag tag-public">Javno</span>
+            </div>
+            <div class="php-file-body">
+                <p><strong>Svrha:</strong> Odjava korisnika — nema HTML prikaza.</p>
+                <ol>
+                    <li>Učitava <code>auth.php</code></li>
+                    <li>Poziva <code>logout()</code> — briše sesiju</li>
+                    <li>Redirect na <code>index.php</code></li>
+                </ol>
+                <p><strong>Baza:</strong> Ne koristi bazu.</p>
+
+                <h3>Objašnjenje koda</h3>
+                <div class="code-explain">
+<pre><code>require_once __DIR__ . '/includes/auth.php';
+logout();
+redirect('index.php');</code></pre>
+                    <div class="explain">Cijeli fajl ima samo 4 linije koda. <strong>logout()</strong> poziva <code>session_unset()</code> i <code>session_destroy()</code>. Nema HTML-a — samo preusmjeravanje. Ovo je tzv. „action script".</div>
+                </div>
+            </div>
+        </article>
+
+        <article class="php-file" id="moje">
+            <div class="php-file-header">
+                <h3>moje-rezervacije.php</h3>
+                <span class="tag tag-auth">Zahtijeva prijavu</span>
+            </div>
+            <div class="php-file-body">
+                <p><strong>Svrha:</strong> Pregled svih rezervacija trenutno prijavljenog korisnika.</p>
+
+                <h3>Tok</h3>
+                <ol>
+                    <li><code>requireLogin()</code> — mora biti prijavljen</li>
+                    <li>SQL JOIN između <code>rezervacije</code> i <code>sobe</code></li>
+                    <li>Filtrira po <code>$_SESSION['korisnik_id']</code></li>
+                    <li>Prikazuje tabelu sa sobom, periodom, cijenom i statusom</li>
+                </ol>
+
+                <pre><code>SELECT r.*, s.naziv AS soba_naziv, s.tip AS soba_tip
+FROM rezervacije r
+JOIN sobe s ON s.id = r.soba_id
+WHERE r.korisnik_id = ?
+ORDER BY r.datum_od DESC</code></pre>
+
+                <h3>Objašnjenje koda</h3>
+                <div class="code-explain">
+<pre><code>requireLogin();
+
+$stmt = getDB()->prepare('... JOIN sobe s ON s.id = r.soba_id ...');
+$stmt->execute([$_SESSION['korisnik_id']]);
+$rezervacije = $stmt->fetchAll();</code></pre>
+                    <div class="explain"><strong>JOIN</strong> spaja rezervacije sa nazivom sobe u jednom upitu. <strong>WHERE r.korisnik_id = ?</strong> prikazuje samo rezervacije trenutnog korisnika — ne može vidjeti tuđe. <strong>fetchAll()</strong> vraća sve redove u niz za foreach u HTML-u.</div>
+                </div>
+            </div>
+        </article>
+    </section>
+
+    <!-- ADMIN -->
+    <section id="admin">
+        <h2>admin/ — Administrativni panel</h2>
+        <div class="info-box">Sve admin stranice pozivaju <code>requireAdmin()</code> na početku — samo korisnici sa ulogom <strong>admin</strong> imaju pristup.</div>
+
+        <article class="php-file" id="admin-index">
+            <div class="php-file-header">
+                <h3>admin/index.php</h3>
+                <span class="tag tag-admin">Admin</span>
+            </div>
+            <div class="php-file-body">
+                <p><strong>Svrha:</strong> Kontrolna tabla — pregled stanja sistema na jednom mjestu.</p>
+
+                <h3>Prikazuje</h3>
+                <ul>
+                    <li>Broj dostupnih soba</li>
+                    <li>Broj aktivnih rezervacija (na čekanju + potvrđene)</li>
+                    <li>Broj rezervacija na čekanju</li>
+                    <li>Broj aktivnih korisnika</li>
+                    <li>Tabelu sa 5 najnovijih rezervacija (JOIN korisnici + sobe)</li>
+                </ul>
+
+                <p><strong>Baza:</strong> 4× COUNT upita + SELECT sa JOIN i LIMIT 5</p>
+
+                <h3>Objašnjenje koda</h3>
+                <div class="code-explain">
+<pre><code>requireAdmin();
+
+$stats = [
+    'sobe' => (int) $db->query('SELECT COUNT(*) FROM sobe WHERE dostupna = 1')->fetchColumn(),
+    'na_cekanju' => (int) $db->query("SELECT COUNT(*) FROM rezervacije WHERE status = 'na_cekanju'")->fetchColumn(),
+    // ...
+];
+
+$recentne = $db->query('
+    SELECT r.*, s.naziv AS soba_naziv, k.ime, k.prezime
+    FROM rezervacije r
+    JOIN sobe s ON s.id = r.soba_id
+    JOIN korisnici k ON k.id = r.korisnik_id
+    ORDER BY r.kreiran_at DESC LIMIT 5
+')->fetchAll();</code></pre>
+                    <div class="explain"><strong>query()</strong> se koristi za jednostavne upite bez parametara. Statistike se čuvaju u asocijativni niz <code>$stats</code> za lakši prikaz u HTML-u. JOIN povezuje tri tabele za prikaz imena gosta i sobe.</div>
+                </div>
+            </div>
+        </article>
+
+        <article class="php-file" id="admin-rez">
+            <div class="php-file-header">
+                <h3>admin/rezervacije.php</h3>
+                <span class="tag tag-admin">Admin</span>
+            </div>
+            <div class="php-file-body">
+                <p><strong>Svrha:</strong> Upravljanje svim rezervacijama u sistemu.</p>
+
+                <h3>GET parametri</h3>
+                <table>
+                    <tr><th>Parametar</th><th>Opis</th></tr>
+                    <tr><td><code>status</code></td><td>Filter po statusu</td></tr>
+                    <tr><td><code>id</code></td><td>Pretraga po ID rezervacije</td></tr>
+                    <tr><td><code>page</code></td><td>Paginacija (10 po stranici)</td></tr>
+                </table>
+
+                <h3>POST akcije</h3>
+                <table>
+                    <tr><th>action</th><th>Šta radi</th></tr>
+                    <tr><td><code>potvrdena</code></td><td>Potvrđuje rezervaciju na čekanju</td></tr>
+                    <tr><td><code>otkazana</code></td><td>Otkazuje rezervaciju</td></tr>
+                    <tr><td><code>zavrsena</code></td><td>Označava boravak kao završen</td></tr>
+                </table>
+
+                <p><strong>Baza:</strong> SELECT sa JOIN (rezervacije + sobe + korisnici), UPDATE statusa</p>
+
+                <h3>Objašnjenje koda</h3>
+
+                <h4 class="code-title">Ažuriranje statusa (POST)</h4>
+                <div class="code-explain">
+<pre><code>if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'], $_POST['id'])) {
+    $action = $_POST['action'];
+    if (in_array($action, ['potvrdena', 'otkazana', 'zavrsena', 'na_cekanju'])) {
+        $stmt = getDB()->prepare('UPDATE rezervacije SET status = ? WHERE id = ?');
+        $stmt->execute([$action, $id]);
+    }
+    redirect('rezervacije.php');
+}</code></pre>
+                    <div class="explain"><strong>in_array()</strong> dozvoljava samo validne statuse — korisnik ne može poslati proizvoljnu vrijednost. Nakon UPDATE-a uvijek redirect da se izbjegne ponovno slanje forme pri refresh-u (POST-redirect-GET pattern).</div>
+                </div>
+
+                <h4 class="code-title">Filter i paginacija</h4>
+                <div class="code-explain">
+<pre><code>if ($idPretraga !== '' && ctype_digit($idPretraga)) {
+    $where[] = 'r.id = ?';
+    $params[] = (int) $idPretraga;
+}
+
+$sql = "SELECT r.*, s.naziv AS soba_naziv, k.ime, k.prezime, k.email
+        $fromJoin $whereClause
+        ORDER BY r.kreiran_at DESC
+        LIMIT $perPage OFFSET $offset";</code></pre>
+                    <div class="explain"><strong>ctype_digit()</strong> provjerava da je pretraga po ID-u samo broj. WHERE klauzula se gradi dinamički — prazan niz filtera znači „sve rezervacije".</div>
+                </div>
+            </div>
+        </article>
+
+        <article class="php-file" id="admin-sobe">
+            <div class="php-file-header">
+                <h3>admin/sobe.php</h3>
+                <span class="tag tag-admin">Admin</span>
+            </div>
+            <div class="php-file-body">
+                <p><strong>Svrha:</strong> Dodavanje novih soba i upravljanje dostupnošću postojećih.</p>
+
+                <h3>POST akcije</h3>
+                <table>
+                    <tr><th>Akcija</th><th>Polja</th><th>Šta radi</th></tr>
+                    <tr><td><code>dodaj_sobu</code></td><td>naziv, opis, tip, kapacitet, cijena_po_noci, dostupna</td><td>INSERT nova soba</td></tr>
+                    <tr><td><code>toggle_dostupnost</code></td><td>id</td><td>Uključuje/isključuje sobu (NOT dostupna)</td></tr>
+                </table>
+
+                <p><strong>Baza:</strong> SELECT sve sobe, INSERT, UPDATE</p>
+
+                <h3>Objašnjenje koda</h3>
+                <div class="code-explain">
+<pre><code>if (isset($_POST['dodaj_sobu'])) {
+    $stmt->execute([
+        trim($_POST['naziv']),
+        $_POST['tip'],
+        (int) $_POST['kapacitet'],
+        (float) $_POST['cijena_po_noci'],
+        isset($_POST['dostupna']) ? 1 : 0,   // checkbox: ako nije čekiran = 0
+    ]);
+} elseif (isset($_POST['toggle_dostupnost'], $_POST['id'])) {
+    $db->prepare('UPDATE sobe SET dostupna = NOT dostupna WHERE id = ?')
+       ->execute([(int) $_POST['id']]);
+}</code></pre>
+                    <div class="explain"><strong>isset($_POST['dodaj_sobu'])</strong> razlikuje akciju dodavanja od toggle-a. Checkbox <code>dostupna</code> šalje vrijednost samo ako je čekiran — zato se koristi ternarni operator. <strong>NOT dostupna</strong> u SQL-u invertuje 0↔1.</div>
+                </div>
+            </div>
+        </article>
+
+        <article class="php-file" id="admin-kor">
+            <div class="php-file-header">
+                <h3>admin/korisnici.php</h3>
+                <span class="tag tag-admin">Admin</span>
+            </div>
+            <div class="php-file-body">
+                <p><strong>Svrha:</strong> Upravljanje korisničkim nalozima.</p>
+
+                <h3>POST — novi korisnik</h3>
+                <p>Polja: ime, prezime, email, password, uloga. Koristi <code>registerUser()</code>, zatim po potrebi postavlja ulogu admin.</p>
+
+                <h3>POST — akcije na postojećem</h3>
+                <table>
+                    <tr><th>action</th><th>Šta radi</th></tr>
+                    <tr><td><code>deaktiviraj</code></td><td>Postavlja aktivan = 0</td></tr>
+                    <tr><td><code>aktiviraj</code></td><td>Postavlja aktivan = 1</td></tr>
+                    <tr><td><code>promijeni_ulogu</code></td><td>Mijenja ulogu (admin/gost)</td></tr>
+                </table>
+
+                <div class="info-box">Admin ne može mijenjati vlastiti nalog (zaštita u kodu).</div>
+
+                <p><strong>Baza:</strong> SELECT, INSERT (preko registerUser), UPDATE</p>
+
+                <h3>Objašnjenje koda</h3>
+                <div class="code-explain">
+<pre><code>if ($id === $currentUserId) {
+    flash('error', 'Ne možete mijenjati vlastiti nalog...');
+} elseif ($action === 'deaktiviraj') {
+    $db->prepare('UPDATE korisnici SET aktivan = 0 WHERE id = ?')->execute([$id]);
+}
+
+// Promjena uloge preko select-a u tabeli:
+&lt;select name="uloga" onchange="this.form.submit()"&gt;
+    &lt;option value="gost"&gt;Gost&lt;/option&gt;
+    &lt;option value="admin"&gt;Admin&lt;/option&gt;
+&lt;/select&gt;</code></pre>
+                    <div class="explain">Admin ne može deaktivirati sam sebe — sprječava zaključavanje iz sistema. <strong>onchange="this.form.submit()"</strong> automatski šalje formu kad se promijeni uloga u padajućem meniju.</div>
+                </div>
+            </div>
+        </article>
+
+        <article class="php-file" id="admin-izv">
+            <div class="php-file-header">
+                <h3>admin/izvjestaji.php</h3>
+                <span class="tag tag-admin">Admin</span>
+            </div>
+            <div class="php-file-body">
+                <p><strong>Svrha:</strong> Mjesečni izvještaj o zauzetosti soba i prihodu.</p>
+
+                <h3>GET parametri</h3>
+                <table>
+                    <tr><th>Parametar</th><th>Opis</th></tr>
+                    <tr><td><code>mjesec</code></td><td>Format YYYY-MM (default: tekući mjesec)</td></tr>
+                </table>
+
+                <h3>Šta računa</h3>
+                <ul>
+                    <li><strong>Ukupna zauzetost</strong> — procenat zauzetih noćenja u mjesecu</li>
+                    <li><strong>Zauzetost po sobi</strong> — prolazi kroz svaki dan mjeseca i provjerava rezervacije</li>
+                    <li><strong>Prihod</strong> — SUM cijena potvrđenih i završenih rezervacija</li>
+                    <li><strong>Statusi</strong> — broj rezervacija po statusu u mjesecu</li>
+                </ul>
+
+                <p>Računaju se samo rezervacije sa statusom <code>potvrdena</code> i <code>zavrsena</code> (za zauzetost i prihod).</p>
+
+                <p><strong>Baza:</strong> SELECT iz <code>sobe</code> i <code>rezervacije</code> (više upita u petlji)</p>
+
+                <h3>Objašnjenje koda</h3>
+
+                <h4 class="code-title">Određivanje perioda</h4>
+                <div class="code-explain">
+<pre><code>$mjesec = $_GET['mjesec'] ?? date('Y-m');
+$prviDan = "$mjesec-01";
+$posljednjiDan = date('Y-m-t', strtotime($prviDan));
+$brojDana = (int) date('t', strtotime($prviDan));</code></pre>
+                    <div class="explain"><strong>date('Y-m-t')</strong> — <code>t</code> daje broj dana u mjesecu (28–31). Za <code>2026-06</code> → posljednji dan je <code>2026-06-30</code>.</div>
+                </div>
+
+                <h4 class="code-title">Računanje zauzetosti po danima</h4>
+                <div class="code-explain">
+<pre><code>for ($dan = 1; $dan <= $brojDana; $dan++) {
+    $trenutniDatum = sprintf('%s-%02d', $mjesec, $dan);
+    foreach ($rezervacije as $rez) {
+        if ($trenutniDatum >= $rez['datum_od'] && $trenutniDatum < $rez['datum_do']) {
+            $zauzetiDani++;
+            break;
+        }
+    }
+}</code></pre>
+                    <div class="explain">Dvostruka petlja: za svaki dan u mjesecu provjerava sve rezervacije te sobe. <strong>sprintf('%02d')</strong> formatira dan sa vodećom nulom (01, 02...). <strong>break</strong> — jedan dan se broji samo jednom čak i ako ima više rezervacija.</div>
+                </div>
+
+                <h4 class="code-title">Prihod u mjesecu</h4>
+                <div class="code-explain">
+<pre><code>SELECT COALESCE(SUM(ukupna_cijena), 0) FROM rezervacije
+WHERE status IN ('potvrdena', 'zavrsena')
+AND datum_od >= ? AND datum_od <= ?</code></pre>
+                    <div class="explain"><strong>COALESCE(..., 0)</strong> vraća 0 ako nema rezervacija (SUM bi inače bio NULL). Filtrira po datumu dolaska u izabranom mjesecu.</div>
+                </div>
+            </div>
+        </article>
+
+        <article class="php-file" id="sidebar">
+            <div class="php-file-header">
+                <h3>admin/includes/sidebar.php</h3>
+                <span class="tag tag-include">Include</span>
+            </div>
+            <div class="php-file-body">
+                <p><strong>Svrha:</strong> Bočni navigacioni meni admin panela.</p>
+                <ul>
+                    <li>Linkovi: Pregled, Rezervacije, Sobe, Korisnici, Izvještaji</li>
+                    <li>Aktivna stavka se označava preko varijable <code>$adminPage</code></li>
+                    <li>Link „Nazad na sajt" vodi na <code>../index.php</code></li>
+                </ul>
+                <p><strong>Baza:</strong> Ne koristi bazu — samo HTML navigacija.</p>
+
+                <h3>Objašnjenje koda</h3>
+                <div class="code-explain">
+<pre><code>$adminPage = $adminPage ?? 'dashboard';
+
+&lt;a href="index.php" class="&lt;?= $adminPage === 'dashboard' ? 'active' : '' ?&gt;"&gt;Pregled&lt;/a&gt;
+&lt;a href="rezervacije.php" class="&lt;?= $adminPage === 'rezervacije' ? 'active' : '' ?&gt;"&gt;Rezervacije&lt;/a&gt;</code></pre>
+                    <div class="explain">Svaka admin stranica postavlja <code>$adminPage</code> prije uključivanja sidebara (npr. <code>'rezervacije'</code>). Ternarni operator dodaje CSS klasu <code>active</code> na trenutnu stavku menija.</div>
+                </div>
+            </div>
+        </article>
+    </section>
+
+    <!-- SETUP -->
+    <section id="setup">
+        <h2>Instalacija</h2>
+
+        <article class="php-file" id="setup-file">
+            <div class="php-file-header">
+                <h3>setup.php</h3>
+                <span class="tag tag-cli">CLI — terminal</span>
+            </div>
+            <div class="php-file-body">
+                <p><strong>Svrha:</strong> Jednokratna instalacija baze podataka i test podataka.</p>
+                <p><strong>Pokretanje:</strong> <code>php setup.php</code> (u terminalu, ne u browseru)</p>
+
+                <h3>Tok izvršavanja</h3>
+                <ol>
+                    <li>Povezuje se na MySQL server (bez odabrane baze)</li>
+                    <li>Čita i izvršava sve SQL naredbe iz <code>sql/schema.sql</code></li>
+                    <li>Kreira bazu <code>turizam_sobe</code> i tabele</li>
+                    <li>Briše postojeće korisnike i dodaje admin + gost sa haširanim lozinkama</li>
+                    <li>Dodaje 2 primjer rezervacije za test gosta</li>
+                    <li>Ispisuje podatke za prijavu u terminal</li>
+                </ol>
+
+                <div class="info-box">
+                    <strong>Test nalozi nakon setup-a:</strong><br>
+                    Admin: admin@turizam.rs / admin123<br>
+                    Gost: gost@turizam.rs / gost123
+                </div>
+
+                <h3>Objašnjenje koda</h3>
+                <div class="code-explain">
+<pre><code>$sql = file_get_contents(__DIR__ . '/sql/schema.sql');
+$statements = array_filter(array_map('trim', explode(';', $sql)));
+
+foreach ($statements as $statement) {
+    if ($statement !== '') {
+        $pdo->exec($statement);
+    }
+}
+
+$adminHash = password_hash('admin123', PASSWORD_DEFAULT);
+$stmt->execute(['Admin', 'Sistem', 'admin@turizam.rs', $adminHash, 'admin']);</code></pre>
+                    <div class="explain"><strong>file_get_contents()</strong> učitava cijeli SQL fajl. <strong>explode(';')</strong> dijeli na pojedinačne naredbe. <strong>password_hash()</strong> kreira siguran bcrypt hash — lozinke se nikad ne čuvaju u plain textu. <strong>exec()</strong> izvršava SQL bez parametara (za CREATE TABLE itd.).</div>
+                </div>
+            </div>
+        </article>
+    </section>
+
+    <section>
+        <h2>Povezanost fajlova</h2>
+        <p>Svaka stranica prati isti obrazac:</p>
+        <pre><code>1. require_once 'includes/auth.php'     ← sesija + baza + funkcije
+2. requireLogin() / requireAdmin()        ← zaštita (ako treba)
+3. Logika (SQL upiti, validacija)         ← obrada podataka
+4. require_once 'includes/header.php'    ← HTML početak
+5. HTML sadržaj stranice
+6. require_once 'includes/footer.php'    ← HTML kraj + JS</code></pre>
+
+        <a href="dokumentacija.html" class="back-btn">← Glavna dokumentacija</a>
+        <a href="index.php" class="back-btn" style="margin-left: 0.5rem;">Aplikacija</a>
+    </section>
+
+</main>
+
+</body>
+</html>
