@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Centralna konfiguracija aplikacije.
+ * Sadrži podatke za konekciju na MySQL i pomoćne funkcije koje koriste sve stranice.
+ */
+
+// Podaci za pristup MySQL bazi — prilagoditi prema lokalnom okruženju
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'turizam_sobe');
 define('DB_USER', 'root');
@@ -7,8 +13,12 @@ define('DB_PASS', '');
 define('DB_CHARSET', 'utf8mb4');
 
 define('APP_NAME', 'Turizam - Rezervacija Soba');
-define('APP_URL', '/');
+define('APP_URL', '/');  // bazni URL za linkove (npr. '/turizam/' ako je u podfolderu)
 
+/**
+ * Vraća PDO konekciju na bazu (singleton — kreira se samo jednom po zahtjevu).
+ * ERRMODE_EXCEPTION baca grešku ako SQL ne uspije; FETCH_ASSOC vraća asocijativne nizove.
+ */
 function getDB(): PDO
 {
     static $pdo = null;
@@ -24,21 +34,25 @@ function getDB(): PDO
     return $pdo;
 }
 
+/** Escape HTML karaktera — štiti od XSS pri ispisu korisničkih podataka */
 function e(string $value): string
 {
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 }
 
+/** Formatira datum iz baze (YYYY-MM-DD) u prikaz dd.mm.yyyy */
 function formatDate(string $date): string
 {
     return date('d.m.Y', strtotime($date));
 }
 
+/** Formatira cijenu za prikaz (npr. 1250.50 → "1.250,50 €") */
 function formatPrice(float $price): string
 {
     return number_format($price, 2, ',', '.') . ' €';
 }
 
+/** Pretvara ENUM tip sobe iz baze u čitljiv naziv na srpskom */
 function tipSobeLabel(string $tip): string
 {
     $labels = [
@@ -51,6 +65,7 @@ function tipSobeLabel(string $tip): string
     return $labels[$tip] ?? $tip;
 }
 
+/** Pretvara ENUM status rezervacije iz baze u čitljiv naziv */
 function statusRezervacijeLabel(string $status): string
 {
     $labels = [
@@ -63,12 +78,14 @@ function statusRezervacijeLabel(string $status): string
     return $labels[$status] ?? $status;
 }
 
+/** Preusmjerava na drugu stranicu i zaustavlja izvršavanje skripte */
 function redirect(string $url): void
 {
     header('Location: ' . $url);
     exit;
 }
 
+/** Pretvara YYYY-MM u čitljiv naziv mjeseca (npr. "2026-06" → "Juni 2026") */
 function nazivMjeseca(string $ym): string
 {
     $mjeseci = [
@@ -83,11 +100,16 @@ function nazivMjeseca(string $ym): string
     return ($mjeseci[$mjesec] ?? $ym) . ' ' . $godina;
 }
 
+/**
+ * Sprema poruku u sesiju za prikaz na sljedećoj stranici (nakon redirect-a).
+ * $type: 'success' ili 'error'
+ */
 function flash(string $type, string $message): void
 {
     $_SESSION['flash'] = ['type' => $type, 'message' => $message];
 }
 
+/** Čita i briše flash poruku — prikazuje se samo jednom */
 function getFlash(): ?array
 {
     if (!isset($_SESSION['flash'])) {

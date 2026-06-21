@@ -8,6 +8,7 @@ require_once __DIR__ . '/config/database.php';
 echo "=== Instalacija " . APP_NAME . " ===\n\n";
 
 try {
+    // Prvo se konektujemo bez imena baze — schema.sql kreira turizam_sobe
     $pdo = new PDO(
         'mysql:host=' . DB_HOST . ';charset=' . DB_CHARSET,
         DB_USER,
@@ -15,6 +16,7 @@ try {
         [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
     );
 
+    // Učitava i izvršava SQL šemu (tabele + početne sobe)
     $sql = file_get_contents(__DIR__ . '/sql/schema.sql');
     $statements = array_filter(array_map('trim', explode(';', $sql)));
 
@@ -28,10 +30,11 @@ try {
 
     $pdo = getDB();
 
+    // Test nalozi sa bcrypt hash lozinkama
     $adminHash = password_hash('admin123', PASSWORD_DEFAULT);
     $gostHash = password_hash('gost123', PASSWORD_DEFAULT);
 
-    $pdo->exec("DELETE FROM korisnici");
+    $pdo->exec("DELETE FROM korisnici");  // briše stare naloge pri ponovnoj instalaciji
 
     $stmt = $pdo->prepare('INSERT INTO korisnici (ime, prezime, email, lozinka, uloga) VALUES (?, ?, ?, ?, ?)');
     $stmt->execute(['Admin', 'Sistem', 'admin@turizam.rs', $adminHash, 'admin']);
@@ -39,6 +42,7 @@ try {
 
     $gostId = (int) $pdo->lastInsertId();
 
+    // Demo rezervacije za testiranje admin panela i izvještaja
     $pdo->prepare('
         INSERT INTO rezervacije (korisnik_id, soba_id, datum_od, datum_do, broj_gostiju, ukupna_cijena, status, napomena)
         VALUES (?, 1, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 3 DAY), 1, 135.00, "potvrdena", "Rani check-in po mogućnosti")

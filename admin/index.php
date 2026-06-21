@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
-requireAdmin();
+requireAdmin();  // samo admin vidi kontrolnu tablu
 
 $adminPage = 'dashboard';
 $currentPage = 'admin';
@@ -8,6 +8,7 @@ $pageTitle = 'Administracija';
 
 $db = getDB();
 
+// Brzi pregled ključnih brojki za dashboard kartice
 $stats = [
     'sobe' => (int) $db->query('SELECT COUNT(*) FROM sobe WHERE dostupna = 1')->fetchColumn(),
     'rezervacije_aktivne' => (int) $db->query("SELECT COUNT(*) FROM rezervacije WHERE status IN ('na_cekanju', 'potvrdena')")->fetchColumn(),
@@ -15,6 +16,7 @@ $stats = [
     'korisnici' => (int) $db->query('SELECT COUNT(*) FROM korisnici WHERE aktivan = 1')->fetchColumn(),
 ];
 
+// Posljednjih 5 rezervacija za brzi pregled — JOIN za ime gosta i naziv sobe
 $recentne = $db->query('
     SELECT r.*, s.naziv AS soba_naziv, k.ime, k.prezime
     FROM rezervacije r

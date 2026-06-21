@@ -1,10 +1,14 @@
 <?php
+// Učitava sesiju, bazu i funkcije za autentifikaciju
 require_once __DIR__ . '/includes/auth.php';
 
+// Samo prijavljeni korisnici mogu kreirati rezervaciju
 requireLogin();
 
+// ID sobe dolazi iz URL-a (otvaranje forme) ili iz POST-a (slanje forme)
 $sobaId = (int) ($_GET['soba_id'] ?? $_POST['soba_id'] ?? 0);
 
+// Učitaj sobu samo ako je dostupna za rezervaciju
 $stmt = getDB()->prepare('SELECT * FROM sobe WHERE id = ? AND dostupna = 1');
 $stmt->execute([$sobaId]);
 $soba = $stmt->fetch();
@@ -17,6 +21,7 @@ if (!$soba) {
 $currentPage = 'rezervacije';
 $pageTitle = 'Rezervacija';
 
+// Obrada forme kada korisnik klikne "Pošalji rezervaciju"
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $datumOd = $_POST['datum_od'] ?? '';
     $datumDo = $_POST['datum_do'] ?? '';
@@ -25,6 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $errors = [];
 
+    // Validacija datuma
     if (!$datumOd || !$datumDo) {
         $errors[] = 'Datum dolaska i odlaska su obavezni.';
     } elseif ($datumOd >= $datumDo) {
@@ -33,14 +39,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'Datum dolaska ne može biti u prošlosti.';
     }
 
+    // Broj gostiju ne smije premašiti kapacitet sobe
     if ($brojGostiju < 1 || $brojGostiju > (int) $soba['kapacitet']) {
         $errors[] = 'Broj gostiju mora biti između 1 i ' . $soba['kapacitet'] . '.';
     }
 
+    // Provjera da soba nema drugu rezervaciju u istom periodu
     if (empty($errors) && !sobaJeDostupna($sobaId, $datumOd, $datumDo)) {
         $errors[] = 'Soba nije dostupna u izabranom periodu.';
     }
 
+    // Ako nema grešaka — snimi rezervaciju u bazu
     if (empty($errors)) {
         $ukupnaCijena = izracunajCijenu((float) $soba['cijena_po_noci'], $datumOd, $datumDo);
 
@@ -49,13 +58,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             VALUES (?, ?, ?, ?, ?, ?, ?)
         ');
         $stmt->execute([
-            $_SESSION['korisnik_id'],
+            $_SESSION['korisnik_id'],  // povezuje rezervaciju sa prijavljenim korisnikom
             $sobaId,
             $datumOd,
             $datumDo,
             $brojGostiju,
             $ukupnaCijena,
-            $napomena ?: null,
+            $napomena ?: null,  // prazna napomena ide kao NULL u bazu
         ]);
 
         flash('success', 'Rezervacija je uspješno poslata. Čeka se potvrda administratora.');
@@ -109,6 +118,7 @@ require_once __DIR__ . '/includes/header.php';
             <textarea id="napomena" name="napomena" rows="3" placeholder="Posebni zahtjevi..."><?= e($_POST['napomena'] ?? '') ?></textarea>
         </div>
 
+        <!-- data-price koristi JavaScript (main.js) za dinamički prikaz cijene -->
         <div class="price-preview" id="pricePreview" data-price="<?= (float) $soba['cijena_po_noci'] ?>">
             <strong>Procijenjena cijena:</strong> <span id="totalPrice">—</span>
         </div>

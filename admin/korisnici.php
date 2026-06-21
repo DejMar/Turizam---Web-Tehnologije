@@ -8,11 +8,13 @@ $pageTitle = 'Upravljanje korisnicima';
 
 $db = getDB();
 
+// POST: deaktivacija, aktivacija ili promjena uloge postojećeg korisnika
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'], $_POST['id'])) {
     $id = (int) $_POST['id'];
     $action = $_POST['action'];
     $currentUserId = (int) $_SESSION['korisnik_id'];
 
+    // Admin ne može sam sebe deaktivirati ili promijeniti ulogu — sprječava zaključavanje
     if ($id === $currentUserId) {
         flash('error', 'Ne možete mijenjati vlastiti nalog na ovaj način.');
     } elseif ($action === 'deaktiviraj') {
@@ -32,6 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'], $_POST['id'
     redirect('korisnici.php');
 }
 
+// POST: admin ručno dodaje novog korisnika (koristi istu registerUser logiku)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['novi_korisnik'])) {
     $result = registerUser(
         trim($_POST['ime'] ?? ''),
@@ -40,6 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['novi_korisnik'])) {
         $_POST['password'] ?? ''
     );
 
+    // registerUser uvijek kreira gosta — ako je izabrano admin, naknadno ažuriramo ulogu
     if ($result['success'] && isset($_POST['uloga']) && $_POST['uloga'] === 'admin') {
         $db->prepare('UPDATE korisnici SET uloga = "admin" WHERE email = ?')->execute([trim($_POST['email'])]);
     }

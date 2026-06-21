@@ -7,6 +7,7 @@
         </div>
     </footer>
 
+    <!-- main.js: dinamički izračun cijene na stranici rezervacije -->
     <script src="<?= e(APP_URL) ?>assets/js/main.js"></script>
 </body>
 </html>

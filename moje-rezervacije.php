@@ -1,11 +1,13 @@
 <?php
 require_once __DIR__ . '/includes/auth.php';
 
+// Samo prijavljeni korisnici vide svoje rezervacije
 requireLogin();
 
 $currentPage = 'rezervacije';
 $pageTitle = 'Moje rezervacije';
 
+// JOIN sa sobe da prikažemo naziv i tip sobe uz svaku rezervaciju
 $stmt = getDB()->prepare('
     SELECT r.*, s.naziv AS soba_naziv, s.tip AS soba_tip
     FROM rezervacije r
@@ -13,7 +15,7 @@ $stmt = getDB()->prepare('
     WHERE r.korisnik_id = ?
     ORDER BY r.datum_od DESC
 ');
-$stmt->execute([$_SESSION['korisnik_id']]);
+$stmt->execute([$_SESSION['korisnik_id']]);  // ID iz sesije — korisnik vidi samo svoje
 $rezervacije = $stmt->fetchAll();
 
 require_once __DIR__ . '/includes/header.php';

@@ -1,12 +1,14 @@
 <?php
 require_once __DIR__ . '/includes/auth.php';
 
+// ID sobe iz URL-a (npr. soba.php?id=3)
 $id = (int) ($_GET['id'] ?? 0);
 
 $stmt = getDB()->prepare('SELECT * FROM sobe WHERE id = ? AND dostupna = 1');
 $stmt->execute([$id]);
 $soba = $stmt->fetch();
 
+// Soba ne postoji ili je onemogućena — vrati korisnika na listu
 if (!$soba) {
     flash('error', 'Soba nije pronađena.');
     redirect('index.php');

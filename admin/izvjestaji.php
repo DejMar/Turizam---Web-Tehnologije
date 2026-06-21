@@ -8,21 +8,23 @@ $pageTitle = 'Izvještaji o zauzetosti';
 
 $db = getDB();
 
+// Mjesec iz URL-a (?mjesec=2026-06) ili trenutni mjesec po defaultu
 $mjesec = $_GET['mjesec'] ?? date('Y-m');
 $godina = (int) substr($mjesec, 0, 4);
 $mjesecBroj = (int) substr($mjesec, 5, 2);
 
 $prviDan = "$mjesec-01";
-$posljednjiDan = date('Y-m-t', strtotime($prviDan));
+$posljednjiDan = date('Y-m-t', strtotime($prviDan));  // zadnji dan u mjesecu
 $brojDana = (int) date('t', strtotime($prviDan));
 
 $sobe = $db->query('SELECT id, naziv, tip FROM sobe ORDER BY naziv')->fetchAll();
 
 $zauzetostPoSobi = [];
 $ukupnoNocenja = 0;
-$maksNocenja = count($sobe) * $brojDana;
+$maksNocenja = count($sobe) * $brojDana;  // ukupno mogućih noćenja = sobe × dani u mjesecu
 
 foreach ($sobe as $soba) {
+    // Uzimamo samo potvrđene i završene rezervacije koje se preklapaju sa mjesecom
     $stmt = $db->prepare("
         SELECT datum_od, datum_do FROM rezervacije
         WHERE soba_id = ?
@@ -33,13 +35,15 @@ foreach ($sobe as $soba) {
     $stmt->execute([$soba['id'], $posljednjiDan, $prviDan]);
     $rezervacije = $stmt->fetchAll();
 
+    // Za svaki dan u mjesecu provjeravamo da li je soba zauzeta
     $zauzetiDani = 0;
     for ($dan = 1; $dan <= $brojDana; $dan++) {
         $trenutniDatum = sprintf('%s-%02d', $mjesec, $dan);
         foreach ($rezervacije as $rez) {
+            // Hotel pravilo: noć = datum >= od AND datum < do (datum odlaska se ne računa)
             if ($trenutniDatum >= $rez['datum_od'] && $trenutniDatum < $rez['datum_do']) {
                 $zauzetiDani++;
-                break;
+                break;  // jedan dan se računa samo jednom po sobi
             }
         }
     }
@@ -56,6 +60,7 @@ foreach ($sobe as $soba) {
 
 $ukupnaZauzetost = $maksNocenja > 0 ? round(($ukupnoNocenja / $maksNocenja) * 100, 1) : 0;
 
+// Prihod = suma ukupna_cijena za rezervacije čiji datum_od pada u izabrani mjesec
 $prihod = $db->prepare("
     SELECT COALESCE(SUM(ukupna_cijena), 0) FROM rezervacije
     WHERE status IN ('potvrdena', 'zavrsena')
@@ -64,6 +69,7 @@ $prihod = $db->prepare("
 $prihod->execute([$prviDan, $posljednjiDan]);
 $ukupniPrihod = (float) $prihod->fetchColumn();
 
+// Broj rezervacija po statusu u izabranom mjesecu
 $statusi = $db->prepare("
     SELECT status, COUNT(*) as broj FROM rezervacije
     WHERE datum_od >= ? AND datum_od <= ?
@@ -72,6 +78,7 @@ $statusi = $db->prepare("
 $statusi->execute([$prviDan, $posljednjiDan]);
 $statistikaStatusa = $statusi->fetchAll();
 
+// Padajući meni: posljednjih 6 mjeseci + sljedeći mjesec
 $mjeseci = [];
 for ($i = -5; $i <= 1; $i++) {
     $mjeseci[] = date('Y-m', strtotime("$i months", strtotime(date('Y-m-01'))));

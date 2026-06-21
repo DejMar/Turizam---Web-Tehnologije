@@ -8,6 +8,7 @@ $pageTitle = 'Upravljanje sobama';
 
 $db = getDB();
 
+// POST: dodavanje nove sobe ili uključivanje/isključivanje dostupnosti
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['dodaj_sobu'])) {
         $stmt = $db->prepare('
@@ -20,10 +21,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST['tip'],
             (int) $_POST['kapacitet'],
             (float) $_POST['cijena_po_noci'],
-            isset($_POST['dostupna']) ? 1 : 0,
+            isset($_POST['dostupna']) ? 1 : 0,  // checkbox — ako nije čekiran, soba je nedostupna
         ]);
         flash('success', 'Soba je dodata.');
     } elseif (isset($_POST['toggle_dostupnost'], $_POST['id'])) {
+        // NOT dostupna — prebacuje 1↔0 bez brisanja iz baze
         $db->prepare('UPDATE sobe SET dostupna = NOT dostupna WHERE id = ?')->execute([(int) $_POST['id']]);
         flash('success', 'Dostupnost sobe je promijenjena.');
     }

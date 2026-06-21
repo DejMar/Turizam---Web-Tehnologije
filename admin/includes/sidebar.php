@@ -1,4 +1,8 @@
 <?php
+/**
+ * Bočni meni admin panela.
+ * Svaka admin stranica postavlja $adminPage prije include-a da označi aktivnu stavku.
+ */
 $adminPage = $adminPage ?? 'dashboard';
 ?>
 <aside class="admin-sidebar">

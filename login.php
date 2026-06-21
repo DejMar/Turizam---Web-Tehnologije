@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/auth.php';
 
+// Već prijavljeni korisnici ne trebaju formu — odmah preusmjeri
 if (isLoggedIn()) {
     redirect(isAdmin() ? 'admin/index.php' : 'index.php');
 }
@@ -14,6 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (login($email, $password)) {
         flash('success', 'Uspješno ste se prijavili.');
+        // Admin ide na panel, gost na početnu stranicu
         redirect(isAdmin() ? 'admin/index.php' : 'index.php');
     }
 

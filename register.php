@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/auth.php';
 
+// Prijavljeni korisnici ne mogu ponovo da se registruju
 if (isLoggedIn()) {
     redirect('index.php');
 }
@@ -9,6 +10,7 @@ $currentPage = 'register';
 $pageTitle = 'Registracija';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // registerUser() validira podatke, hashuje lozinku i upisuje u bazu
     $result = registerUser(
         trim($_POST['ime'] ?? ''),
         trim($_POST['prezime'] ?? ''),
@@ -18,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($result['success']) {
         flash('success', $result['message']);
-        redirect('login.php');
+        redirect('login.php');  // nakon registracije ide na prijavu
     }
 
     flash('error', $result['message']);

@@ -1,8 +1,12 @@
 <?php
+/**
+ * Zajednički HTML header za sve stranice.
+ * Svaka stranica prije include-a postavlja $currentPage i $pageTitle.
+ */
 require_once __DIR__ . '/auth.php';
 
 $currentPage = $currentPage ?? '';
-$user = currentUser();
+$user = currentUser();  // null ako korisnik nije prijavljen
 ?>
 <!DOCTYPE html>
 <html lang="sr">
@@ -19,6 +23,7 @@ $user = currentUser();
             <nav class="nav">
                 <a href="<?= e(APP_URL) ?>index.php" class="<?= $currentPage === 'sobe' ? 'active' : '' ?>">Sobe</a>
                 <?php if ($user): ?>
+                    <!-- Meni za prijavljenog korisnika -->
                     <a href="<?= e(APP_URL) ?>moje-rezervacije.php" class="<?= $currentPage === 'rezervacije' ? 'active' : '' ?>">Moje rezervacije</a>
                     <?php if (isAdmin()): ?>
                         <a href="<?= e(APP_URL) ?>admin/index.php" class="<?= str_starts_with($currentPage, 'admin') ? 'active' : '' ?>">Administracija</a>
@@ -26,6 +31,7 @@ $user = currentUser();
                     <span class="user-greeting">Zdravo, <?= e($user['ime']) ?></span>
                     <a href="<?= e(APP_URL) ?>logout.php" class="btn btn-outline btn-sm">Odjava</a>
                 <?php else: ?>
+                    <!-- Meni za gosta (neprijavljenog) -->
                     <a href="<?= e(APP_URL) ?>login.php" class="<?= $currentPage === 'login' ? 'active' : '' ?>">Prijava</a>
                     <a href="<?= e(APP_URL) ?>register.php" class="btn btn-primary btn-sm">Registracija</a>
                 <?php endif; ?>
@@ -36,6 +42,7 @@ $user = currentUser();
     <main class="main">
         <div class="container">
             <?php $flash = getFlash(); if ($flash): ?>
+                <!-- Poruka nakon redirect-a (npr. uspješna prijava ili greška) -->
                 <div class="alert alert-<?= e($flash['type']) ?>">
                     <?= e($flash['message']) ?>
                 </div>

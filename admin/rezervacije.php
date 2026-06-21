@@ -1,29 +1,34 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
-requireAdmin();
+requireAdmin();  // samo admin može upravljati rezervacijama
 
 $adminPage = 'rezervacije';
 $currentPage = 'admin';
 $pageTitle = 'Upravljanje rezervacijama';
 
+// POST: admin mijenja status rezervacije (Potvrdi / Otkaži / Završi)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'], $_POST['id'])) {
     $id = (int) $_POST['id'];
     $action = $_POST['action'];
 
+    // in_array dozvoljava samo validne statuse — zaštita od manipulacije
     if (in_array($action, ['potvrdena', 'otkazana', 'zavrsena', 'na_cekanju'])) {
         $stmt = getDB()->prepare('UPDATE rezervacije SET status = ? WHERE id = ?');
         $stmt->execute([$action, $id]);
         flash('success', 'Status rezervacije je ažuriran.');
     }
 
+    // Redirect nakon POST-a sprečava ponovno slanje pri osvježavanju stranice
     redirect('rezervacije.php');
 }
 
+// GET filteri za listu rezervacija
 $statusFilter = $_GET['status'] ?? '';
-$idPretraga = ltrim(trim($_GET['id'] ?? ''), '#');
+$idPretraga = ltrim(trim($_GET['id'] ?? ''), '#');  // dozvoljava unos "#5" ili "5"
 $perPage = 10;
 $page = max(1, (int) ($_GET['page'] ?? 1));
 
+// JOIN povezuje rezervacije sa nazivom sobe i podacima gosta
 $fromJoin = '
     FROM rezervacije r
     JOIN sobe s ON s.id = r.soba_id
@@ -38,6 +43,7 @@ if ($statusFilter && in_array($statusFilter, ['na_cekanju', 'potvrdena', 'otkaza
     $params[] = $statusFilter;
 }
 
+// Pretraga po ID rezervacije — ctype_digit osigurava da je unos broj
 if ($idPretraga !== '' && ctype_digit($idPretraga)) {
     $where[] = 'r.id = ?';
     $params[] = (int) $idPretraga;
@@ -49,7 +55,7 @@ $countStmt = getDB()->prepare("SELECT COUNT(*) $fromJoin $whereClause");
 $countStmt->execute($params);
 $totalRezervacija = (int) $countStmt->fetchColumn();
 $totalPages = max(1, (int) ceil($totalRezervacija / $perPage));
-$page = min($page, $totalPages);
+$page = min($page, $totalPages);  // ako je page prevelik, vrati na zadnju stranicu
 $offset = ($page - 1) * $perPage;
 
 $sql = "
@@ -58,12 +64,13 @@ $sql = "
     $whereClause
     ORDER BY r.kreiran_at DESC
     LIMIT $perPage OFFSET $offset
-";
+";  // LIMIT/OFFSET kao brojevi — MySQL PDO ne podržava bind za LIMIT
 
 $stmt = getDB()->prepare($sql);
 $stmt->execute($params);
 $rezervacije = $stmt->fetchAll();
 
+// URL za paginaciju — čuva aktivne filtere (status, id)
 function rezervacijePaginationUrl(int $pageNum, string $status, string $id): string
 {
     $query = ['page' => $pageNum];
