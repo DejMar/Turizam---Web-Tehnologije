@@ -4,38 +4,45 @@ require_once __DIR__ . '/includes/auth.php';
 $currentPage = 'sobe';
 $pageTitle = 'Pregled soba';
 
+// Čitanje filtera iz URL-a (npr. index.php?tip=apartman&pretraga=more&page=2)
 $tip = $_GET['tip'] ?? '';
 $pretraga = trim($_GET['pretraga'] ?? '');
-$perPage = 6;
+$perPage = 6;  // broj soba po stranici
 $page = max(1, (int) ($_GET['page'] ?? 1));
 
+// Dinamički gradimo WHERE klauzulu — počinjemo sa uvjetom dostupnosti
 $where = 'WHERE dostupna = 1';
 $params = [];
 
+// Filter po tipu — in_array validira da je vrijednost dozvoljena (zaštita od injection)
 if ($tip && in_array($tip, ['jednokrevetna', 'dvokrevetna', 'apartman', 'suite'])) {
     $where .= ' AND tip = ?';
     $params[] = $tip;
 }
 
+// Pretraga po nazivu ili opisu sobe
 if ($pretraga !== '') {
     $where .= ' AND (naziv LIKE ? OR opis LIKE ?)';
     $params[] = "%$pretraga%";
     $params[] = "%$pretraga%";
 }
 
+// Ukupan broj soba za paginaciju
 $countStmt = getDB()->prepare("SELECT COUNT(*) FROM sobe $where");
 $countStmt->execute($params);
 $totalSoba = (int) $countStmt->fetchColumn();
 $totalPages = max(1, (int) ceil($totalSoba / $perPage));
-$page = min($page, $totalPages);
+$page = min($page, $totalPages);  // ne dozvoljava stranicu veću od maksimuma
 $offset = ($page - 1) * $perPage;
 
+// LIMIT/OFFSET moraju biti cijeli brojevi u SQL-u (ne mogu kao ? parametri u MySQL-u)
 $sql = "SELECT * FROM sobe $where ORDER BY cijena_po_noci ASC LIMIT $perPage OFFSET $offset";
 
 $stmt = getDB()->prepare($sql);
 $stmt->execute($params);
 $sobe = $stmt->fetchAll();
 
+/** Gradi URL za paginaciju uz očuvanje aktivnih filtera */
 function paginationUrl(int $pageNum, string $tipFilter, string $pretragaFilter): string
 {
     $query = ['page' => $pageNum];
